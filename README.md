@@ -6,4 +6,4 @@ ved første gang du køre projektet køre `docker compose up -d --build` i vs co
 efter følgende start container fra docker GUI eller køre `docker compose up -d` i ternimal
 
 
-Besøg `http://localhost:3000/api-docs` for at se API i vores database
+Besøg `http://localhost:3000/docs` for at se API i vores database

@@ -1,10 +1,28 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from database import Base
+from datetime import datetime, timezone
+
+## this file contains the database models
+## each model is a class that inherits from Base
+## Base is a declarative_base instance from SQLAlchemy
+## it is used to create the database tables
 
 
-class Example(Base):
-    __tablename__ = "examples"
+
+## Function to get the current UTC time
+def get_current_utc_time():
+    return datetime.now(tz=timezone.utc)
+
+## User model - represents the users table in the database boksfit
+class User(Base):
+    __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    description = Column(String)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=get_current_utc_time())
+
+    # Relationship example
+    items = relationship("Item", back_populates="owner")

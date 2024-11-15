@@ -7,8 +7,7 @@ import os
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
-
+app = FastAPI(debug=True)
 
 # Dependency
 def get_db():
@@ -22,7 +21,6 @@ def get_db():
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
-
 
 @app.get("/health")
 def health_check():

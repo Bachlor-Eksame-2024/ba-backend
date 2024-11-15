@@ -9,11 +9,6 @@ from datetime import datetime, timezone
 ## it is used to create the database tables
 
 
-
-## Function to get the current UTC time
-def get_current_utc_time():
-    return datetime.now(tz=timezone.utc)
-
 ## User model - represents the users table in the database boksfit
 class User(Base):
     __tablename__ = "users"
@@ -22,7 +17,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=get_current_utc_time())
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     # Relationship example
     items = relationship("Item", back_populates="owner")

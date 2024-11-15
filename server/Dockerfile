@@ -1,20 +1,28 @@
-# Use the official Node.js image as the base
-FROM node:18
+# Use Python 3.9 slim image as base
+FROM python:3.9-slim
 
-# Set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files
-COPY package.json ./
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    gcc \
+    python3-dev \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install dependencies
-RUN npm install
+# Copy requirements file
+COPY requirements.txt .
 
-# Copy the rest of the application code
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application
 COPY . .
 
-# Expose the application port
-EXPOSE 3000
+# Expose port 8000
+EXPOSE 8000
 
-# Start the application in development mode with live reloading
-CMD ["npm", "run", "dev"]
+# Command to run the application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000", "--reload"]

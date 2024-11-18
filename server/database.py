@@ -7,7 +7,8 @@ import os
 SQLALCHEMY_DATABASE_URL = os.getenv(
     ## DATABASE_URL is the default Postgres environment variable taken from the docker-compose file
     ## the default value is "postgresql://postgres:postgres@postgres:5432/postgres" if no variable is set
-    "DATABASE_URL", "postgresql://yourusername:yourpassword@postgres:5432/yourdatabase"
+    "DATABASE_URL",
+    "postgresql://yourusername:yourpassword@postgres:5432/yourdatabase",
 )
 
 ## use flush=True to force print to stdout immediately

@@ -1,17 +1,23 @@
 from fastapi import APIRouter, Request, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
+from passlib.context import CryptContext
 from datetime import datetime, timedelta, timezone
 from .jwt import create_access_token, get_current_user
 from authentication.types.auth_classes import SignupUser, LoginUser
 
 authentication_router = APIRouter()
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 ############################################
 ##### Login Endpoint #####
 @authentication_router.post("/login")
 async def login(user: LoginUser):
+
+    ## compare the password with the hashed password
+    #pwd_context.verify(plain_password, hashed_password)
+
     user_info = {
         "email": user.email,
         "first_name": "Jaime",
@@ -40,9 +46,10 @@ async def login(user: LoginUser):
 ##### Signup Endpoint #####
 @authentication_router.post("/signup")
 async def signup(user: SignupUser):
-
+    hash_password = pwd_context.hash(user.password)
     user_info = {
         "email": user.email,
+        "password": hash_password,
         "first_name": user.first_name,
         "first_last": user.last_name,
         "fitness_center_id": user.fitness_center_id,

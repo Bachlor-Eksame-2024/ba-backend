@@ -9,3 +9,4 @@ pydantic[email]  # For handling data validation and parsing
 python-multipart
 passlib[bcrypt]  # For hashing passwords
 pyjwt  # For handling JWT tokens
+pytest

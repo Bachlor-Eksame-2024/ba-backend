@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from database import SessionLocal, engine, Base
 from authentication.authentications import authentication_router
 from fastapi.middleware.cors import CORSMiddleware
-import models
+# import models
 import os
 
 

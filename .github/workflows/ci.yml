@@ -1,9 +1,6 @@
-name: Backend CI Pipeline
+name: FastAPI CI Pipeline
 
 on:
-  push:
-    branches:
-      - develop
   pull_request:
     branches:
       - develop
@@ -14,6 +11,7 @@ env:
   POSTGRES_DB: test_db
   PGADMIN_DEFAULT_EMAIL: admin@admin.com
   PGADMIN_DEFAULT_PASSWORD: admin
+  COMPOSE_PROJECT_NAME: ba-backend
 
 jobs:
   test-and-lint:
@@ -33,21 +31,62 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install flake8
+        shell: cmd
 
       - name: Run linting
         working-directory: ./server
         run: |
           flake8 . --max-line-length=100 --exclude=__pycache__,.venv
+        shell: cmd
 
       - name: Run tests
         working-directory: ./server
         run: |
           pytest -v --cov=. --cov-report=term-missing
+        shell: cmd
 
-      - name: Build and test Docker containers
+      - name: Start Docker Compose
         run: |
-          docker-compose build
-          docker-compose up -d
-          timeout 30 bash -c 'until curl -f http://localhost:3000/docs; do sleep 1; done'
-          docker-compose logs fastapi
-          docker-compose down -v
+          docker compose version
+          docker compose down -v --remove-orphans
+          docker compose build --no-cache
+          docker compose up -d
+        shell: cmd
+
+      - name: Wait for FastAPI
+        run: |
+          powershell -Command {
+            $attempts = 30
+            $url = "http://localhost:3000/docs"
+            
+            while ($attempts -gt 0) {
+              try {
+                $response = Invoke-WebRequest -Uri $url -UseBasicParsing
+                if ($response.StatusCode -eq 200) {
+                  Write-Host "FastAPI is up!"
+                  exit 0
+                }
+              }
+              catch {
+                Write-Host "Waiting for FastAPI to be ready..."
+                Start-Sleep -Seconds 2
+                $attempts--
+              }
+            }
+            
+            Write-Error "FastAPI failed to start"
+            exit 1
+          }
+        shell: powershell
+
+      - name: Show Docker logs
+        if: always()
+        run: |
+          docker compose logs
+        shell: cmd
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker compose down -v --remove-orphans
+        shell: cmd

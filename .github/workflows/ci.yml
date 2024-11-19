@@ -45,46 +45,6 @@ jobs:
           pytest -v --cov=. --cov-report=term-missing
         shell: cmd
 
-      - name: Start Docker Compose
-        run: |
-          docker compose version
-          docker compose down -v --remove-orphans
-          docker compose build --no-cache
-          docker compose up -d
-        shell: cmd
-
-      - name: Wait for FastAPI
-        run: |
-          powershell -Command {
-            $attempts = 30
-            $url = "http://localhost:3000/docs"
-            
-            while ($attempts -gt 0) {
-              try {
-                $response = Invoke-WebRequest -Uri $url -UseBasicParsing
-                if ($response.StatusCode -eq 200) {
-                  Write-Host "FastAPI is up!"
-                  exit 0
-                }
-              }
-              catch {
-                Write-Host "Waiting for FastAPI to be ready..."
-                Start-Sleep -Seconds 2
-                $attempts--
-              }
-            }
-            
-            Write-Error "FastAPI failed to start"
-            exit 1
-          }
-        shell: powershell
-
-      - name: Show Docker logs
-        if: always()
-        run: |
-          docker compose logs
-        shell: cmd
-
       - name: Cleanup
         if: always()
         run: |

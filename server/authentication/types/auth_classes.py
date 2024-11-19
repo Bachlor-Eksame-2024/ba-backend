@@ -13,6 +13,7 @@ class User(BaseModel):
     created_at: str
     updated_at: str
 
+
 class SignupUser(BaseModel):
     email: str
     password: str
@@ -20,6 +21,7 @@ class SignupUser(BaseModel):
     first_name: str
     last_name: str
     fitness_center_id: str
+
 
 class LoginUser(BaseModel):
     email: str

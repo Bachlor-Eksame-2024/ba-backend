@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
+from fastapi import FastAPI
+
+# from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base
 from authentication.authentications import authentication_router
 from fastapi.middleware.cors import CORSMiddleware
@@ -25,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -33,13 +35,17 @@ def get_db():
     finally:
         db.close()
 
+
 if os.getenv("ENABLE_USER_AUTH", "true") == "true":
-    app.include_router(authentication_router, prefix="/api/auth", tags=["User Authentication"])
+    app.include_router(
+        authentication_router, prefix="/api/auth", tags=["User Authentication"]
+    )
 
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
+
 
 @app.get("/health")
 def health_check():

@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Request, HTTPException, status, Depends
+from fastapi import APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
 from passlib.context import CryptContext
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from .jwt import create_access_token, get_current_user
 from authentication.types.auth_classes import SignupUser, LoginUser
 
@@ -10,13 +10,13 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-############################################
+#####
 ##### Login Endpoint #####
 @authentication_router.post("/login")
 async def login(user: LoginUser):
 
     ## compare the password with the hashed password
-    #pwd_context.verify(plain_password, hashed_password)
+    # pwd_context.verify(plain_password, hashed_password)
 
     user_info = {
         "email": user.email,
@@ -42,7 +42,7 @@ async def login(user: LoginUser):
     return response
 
 
-############################################
+#####
 ##### Signup Endpoint #####
 @authentication_router.post("/signup")
 async def signup(user: SignupUser):
@@ -72,7 +72,7 @@ async def signup(user: SignupUser):
     return response
 
 
-############################################
+#####
 ##### Log out Endpoint #####
 @authentication_router.get("/logout")  # , response_model=Token)
 async def logout(request: Request):
@@ -83,7 +83,7 @@ async def logout(request: Request):
     return response
 
 
-############################################
+#####
 ##### Verify User login Endpoint #####
 @authentication_router.get("/verify-login")  # , response_model=Token)
 async def verify_Login(current_user: dict = Depends(get_current_user)):

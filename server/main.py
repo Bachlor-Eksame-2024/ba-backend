@@ -3,6 +3,7 @@ from fastapi import FastAPI
 # from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base
 from authentication.authentications import authentication_router
+from workouts.workout import workout_router
 from fastapi.middleware.cors import CORSMiddleware
 # import models
 import os
@@ -39,6 +40,10 @@ def get_db():
 if os.getenv("ENABLE_USER_AUTH", "true") == "true":
     app.include_router(
         authentication_router, prefix="/api/auth", tags=["User Authentication"]
+    )
+if os.getenv("ENABLE_WORKOUT", "true") == "true":
+    app.include_router(
+        workout_router, prefix="/api/workout", tags=["Workouts"]
     )
 
 

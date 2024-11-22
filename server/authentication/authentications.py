@@ -102,15 +102,15 @@ async def verify_Login(current_user: dict = Depends(get_current_user)):
 ##### Change Password Endpoint #####
 @authentication_router.post("/change-password")
 async def change_password(
-    current_user: dict = Depends(get_current_user), db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
-    
+
     # Get all the users from the database
     db_users = db.query(User).all()
     # Print the users to the console
     for user in db_users:
         print(user.__dict__, flush=True)
-
 
     # Get the user info from the current_user
     # Get the new password and the old password from the request

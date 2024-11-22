@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Request, Depends
 from fastapi.responses import JSONResponse
 from passlib.context import CryptContext
+from sqlalchemy.orm import Session
 from datetime import timedelta
 from .jwt import create_access_token, get_current_user
 from authentication.types.auth_classes import SignupUser, LoginUser
+from database import get_db
+from models import User
 
 authentication_router = APIRouter()
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -93,3 +96,26 @@ async def verify_Login(current_user: dict = Depends(get_current_user)):
             status_code=200,
         )
     return response
+
+
+#####
+##### Change Password Endpoint #####
+@authentication_router.post("/change-password")
+async def change_password(
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+
+    # Get all the users from the database
+    db_users = db.query(User).all()
+    # Print the users to the console
+    for user in db_users:
+        print(user.__dict__, flush=True)
+
+    # Get the user info from the current_user
+    # Get the new password and the old password from the request
+    # Compare the old password with the hashed password
+    # Hash the new password
+    # Update the password with the new password
+
+    return "Change Password"

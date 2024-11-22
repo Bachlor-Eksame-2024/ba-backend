@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime, timezone
 
@@ -25,4 +24,4 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     # Relationship example
-    items = relationship("Item", back_populates="owner")
+    # items = relationship("Item", back_populates="owner")

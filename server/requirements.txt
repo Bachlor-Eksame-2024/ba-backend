@@ -11,3 +11,4 @@ passlib[bcrypt]  # For hashing passwords
 pyjwt  # For handling JWT tokens
 pytest # For running tests
 pytest-cov # For running tests and generating coverage reports
+fastapi-mail # For sending emails

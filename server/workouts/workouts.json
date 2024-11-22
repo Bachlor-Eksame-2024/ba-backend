@@ -12,15 +12,15 @@
         "exercises": [
           {
             "exercise_name": "Bench Press",
-            "exercise_description": "This is a bench press"
+            "exercise_description": "A compound exercise that primarily targets the chest muscles, while also engaging the shoulders and triceps. It is performed by pressing a barbell or dumbbells away from the chest while lying on a bench."
           },
           {
             "exercise_name": "Pushups",
-            "exercise_description": "This is a pushup"
+            "exercise_description": "A bodyweight exercise that targets the chest, shoulders, and triceps, performed by lowering and raising the body using the arms while maintaining a plank position."
           },
           {
             "exercise_name": "Chest Fly",
-            "exercise_description": "This is a chest fly"
+            "exercise_description": "An isolation exercise targeting the chest muscles, performed by lying on a bench and extending the arms out to the sides with dumbbells, then bringing them together in a hugging motion."
           }
         ]
       },
@@ -31,15 +31,15 @@
         "exercises": [
           {
             "exercise_name": "Incline Bench Press",
-            "exercise_description": "This is an incline bench press"
+            "exercise_description": "A variation of the bench press performed on an incline bench, targeting the upper chest muscles and shoulders for improved strength and muscle definition."
           },
           {
             "exercise_name": "Dumbbell Fly",
-            "exercise_description": "This is a dumbbell fly"
+            "exercise_description": "An isolation exercise targeting the chest muscles, performed by lying on a bench and extending the arms out to the sides with dumbbells, then bringing them together in a hugging motion."
           },
           {
             "exercise_name": "Chest Press",
-            "exercise_description": "This is a chest press"
+            "exercise_description": "A fundamental exercise that targets the chest muscles, helping to build strength and muscle mass in the pectoral region."
           }
         ]
       },
@@ -50,15 +50,15 @@
         "exercises": [
           {
             "exercise_name": "Decline Bench Press",
-            "exercise_description": "This is a decline bench press"
+            "exercise_description": "A variation of the bench press that targets the lower part of the chest muscles by performing the exercise on a decline bench."
           },
           {
             "exercise_name": "Chest Press",
-            "exercise_description": "This is a chest press"
+            "exercise_description": "A fundamental exercise that targets the chest muscles, helping to build strength and muscle mass in the pectoral region."
           },
           {
             "exercise_name": "Chest Fly",
-            "exercise_description": "This is a chest fly"
+            "exercise_description": "An isolation exercise that targets the chest muscles, performed by extending the arms out to the sides and bringing them together in a hugging motion."
           }
         ]
       },
@@ -69,15 +69,15 @@
         "exercises": [
           {
             "exercise_name": "Dumbbell Bench Press",
-            "exercise_description": "This is a dumbbell bench press"
+            "exercise_description": "A compound exercise targeting the chest, shoulders, and triceps using dumbbells for added stability and range of motion."
           },
           {
             "exercise_name": "Chest Press",
-            "exercise_description": "This is a chest press"
+            "exercise_description": "A fundamental exercise that targets the chest muscles, helping to build strength and muscle mass in the pectoral region."
           },
           {
             "exercise_name": "Chest Fly",
-            "exercise_description": "This is a chest fly"
+            "exercise_description": "An isolation exercise targeting the chest muscles, performed by extending the arms out to the sides and bringing them together in a hugging motion."
           }
         ]
       }
@@ -99,15 +99,15 @@
         "exercises": [
           {
             "exercise_name": "Squats",
-            "exercise_description": "This is a squat"
+            "exercise_description": "A fundamental lower body exercise that targets the quadriceps, hamstrings, and glutes. It involves bending the knees and lowering the hips as if sitting back into a chair, then returning to a standing position."
           },
           {
             "exercise_name": "Pushups",
-            "exercise_description": "This is a pushup"
+            "exercise_description": "A classic upper body exercise that strengthens the chest, shoulders, and triceps. It is performed by lowering and raising the body using the arms while maintaining a straight line from head to heels."
           },
           {
             "exercise_name": "Plank",
-            "exercise_description": "This is a plank"
+            "exercise_description": "An isometric core exercise that involves maintaining a position similar to a pushup for the maximum possible time, engaging the abdominal muscles, back, and shoulders."
           }
         ]
       },
@@ -118,15 +118,15 @@
         "exercises": [
           {
             "exercise_name": "Deadlifts",
-            "exercise_description": "This is a deadlift"
+            "exercise_description": "A compound exercise that targets multiple muscle groups, including the lower back, glutes, hamstrings, and core. It involves lifting a loaded barbell from the ground to a standing position."
           },
           {
             "exercise_name": "Pullups",
-            "exercise_description": "This is a pullup"
+            "exercise_description": "An upper body exercise that primarily targets the latissimus dorsi muscles in the back, as well as the biceps and shoulders. It is performed by pulling the body up to a bar until the chin is above the bar."
           },
           {
             "exercise_name": "Russian Twists",
-            "exercise_description": "This is a Russian twist"
+            "exercise_description": "A core exercise that targets the oblique muscles. It is performed by sitting on the floor with knees bent, leaning back slightly, and twisting the torso from side to side while holding a weight or medicine ball."
           }
         ]
       },
@@ -137,15 +137,15 @@
         "exercises": [
           {
             "exercise_name": "Burpees",
-            "exercise_description": "This is a burpee"
+            "exercise_description": "A full-body exercise that combines a squat, push-up, and jump to improve cardiovascular fitness, strength, and endurance."
           },
           {
             "exercise_name": "Overhead Press",
-            "exercise_description": "This is an overhead press"
+            "exercise_description": "A compound exercise that targets the shoulders, triceps, and upper chest by pressing a barbell or dumbbells overhead from shoulder height."
           },
           {
             "exercise_name": "Leg Raises",
-            "exercise_description": "This is a leg raise"
+            "exercise_description": "An effective core exercise that targets the lower abdominal muscles by lifting the legs while lying flat on the back."
           }
         ]
       },
@@ -156,15 +156,15 @@
         "exercises": [
           {
             "exercise_name": "Lunges",
-            "exercise_description": "This is a lunge"
+            "exercise_description": "A lower body exercise that targets the quadriceps, hamstrings, and glutes. It involves stepping forward with one leg and lowering the hips until both knees are bent at a 90-degree angle."
           },
           {
             "exercise_name": "Mountain Climbers",
-            "exercise_description": "This is a mountain climber"
+            "exercise_description": "A full-body exercise that combines cardio and strength training. It involves alternating knee drives towards the chest from a plank position, engaging the core, shoulders, and legs."
           },
           {
             "exercise_name": "Side Plank",
-            "exercise_description": "This is a side plank"
+            "exercise_description": "An isometric core exercise that targets the obliques and improves stability. It involves balancing on one forearm and the side of one foot while keeping the body in a straight line."
           }
         ]
       }
@@ -186,15 +186,15 @@
         "exercises": [
           {
             "exercise_name": "Barbell Squats",
-            "exercise_description": "This is a barbell squat"
+            "exercise_description": "A fundamental lower body exercise that targets the quadriceps, hamstrings, and glutes. It involves lifting a barbell while performing a squat, enhancing overall leg strength and stability."
           },
           {
             "exercise_name": "Bench Press",
-            "exercise_description": "This is a bench press"
+            "exercise_description": "A compound upper body exercise that primarily targets the chest muscles, while also engaging the shoulders and triceps. It is performed by pressing a barbell away from the chest while lying on a bench."
           },
           {
             "exercise_name": "Pullups",
-            "exercise_description": "This is a pullup"
+            "exercise_description": "An upper body exercise that primarily targets the latissimus dorsi muscles in the back, as well as the biceps and shoulders. It is performed by pulling the body up to a bar until the chin is above the bar."
           }
         ]
       },
@@ -205,15 +205,15 @@
         "exercises": [
           {
             "exercise_name": "Deadlifts",
-            "exercise_description": "This is a deadlift"
+            "exercise_description": "A compound exercise that targets the entire posterior chain, including the lower back, glutes, hamstrings, and core. It involves lifting a loaded barbell from the ground to a standing position."
           },
           {
             "exercise_name": "Military Press",
-            "exercise_description": "This is a military press"
+            "exercise_description": "A shoulder exercise that involves pressing a barbell or dumbbells overhead from shoulder height, targeting the deltoids, triceps, and upper chest."
           },
           {
             "exercise_name": "Chin-ups",
-            "exercise_description": "This is a chin-up"
+            "exercise_description": "An upper body exercise that primarily targets the biceps and upper back muscles. It is performed by pulling the body up to a bar with an underhand grip until the chin is above the bar."
           }
         ]
       },
@@ -224,15 +224,15 @@
         "exercises": [
           {
             "exercise_name": "Front Squats",
-            "exercise_description": "This is a front squat"
+            "exercise_description": "A lower body exercise that targets the quadriceps, glutes, and core. It involves holding a barbell across the front of the shoulders and performing a squat, promoting strength and stability."
           },
           {
             "exercise_name": "Incline Bench Press",
-            "exercise_description": "This is an incline bench press"
+            "exercise_description": "A variation of the bench press performed on an incline bench, targeting the upper chest and shoulders. It helps in building upper body strength and muscle definition."
           },
           {
             "exercise_name": "Barbell Rows",
-            "exercise_description": "This is a barbell row"
+            "exercise_description": "A compound exercise that targets the back muscles, including the latissimus dorsi, rhomboids, and trapezius. It involves pulling a barbell towards the torso while bent over, enhancing back strength and posture."
           }
         ]
       },
@@ -243,15 +243,15 @@
         "exercises": [
           {
             "exercise_name": "Sumo Deadlifts",
-            "exercise_description": "This is a sumo deadlift"
+            "exercise_description": "A variation of the traditional deadlift that targets the inner thighs, glutes, and lower back. It involves a wider stance and gripping the barbell with hands placed inside the knees."
           },
           {
             "exercise_name": "Push Press",
-            "exercise_description": "This is a push press"
+            "exercise_description": "A compound exercise that combines a shoulder press with a slight leg drive, targeting the shoulders, triceps, and upper chest. It involves pressing a barbell overhead from shoulder height using momentum from the legs."
           },
           {
             "exercise_name": "Farmer’s Walk",
-            "exercise_description": "This is a farmer's walk"
+            "exercise_description": "A functional strength exercise that targets the grip, forearms, shoulders, and core. It involves walking a set distance while carrying heavy weights in each hand, simulating the action of carrying heavy loads."
           }
         ]
       }
@@ -273,15 +273,15 @@
         "exercises": [
           {
             "exercise_name": "Jogging",
-            "exercise_description": "This is a jogging session"
+            "exercise_description": "A cardiovascular exercise that involves running at a steady, moderate pace to improve endurance and cardiovascular health."
           },
           {
             "exercise_name": "Jump Rope",
-            "exercise_description": "This is a jump rope session"
+            "exercise_description": "A high-intensity cardiovascular exercise that involves jumping over a swinging rope, enhancing coordination, agility, and cardiovascular fitness."
           },
           {
             "exercise_name": "High Knees",
-            "exercise_description": "This is a high knees exercise"
+            "exercise_description": "A dynamic exercise that involves running in place while lifting the knees as high as possible, targeting the core, hip flexors, and cardiovascular system."
           }
         ]
       },
@@ -292,15 +292,15 @@
         "exercises": [
           {
             "exercise_name": "Cycling",
-            "exercise_description": "This is a cycling session"
+            "exercise_description": "A low-impact cardiovascular exercise that involves pedaling a stationary or outdoor bicycle, improving leg strength, endurance, and overall cardiovascular health."
           },
           {
             "exercise_name": "Burpees",
-            "exercise_description": "This is a burpee session"
+            "exercise_description": "A full-body exercise that combines a squat, push-up, and jump to enhance cardiovascular fitness, strength, and endurance."
           },
           {
             "exercise_name": "Mountain Climbers",
-            "exercise_description": "This is a mountain climber session"
+            "exercise_description": "A high-intensity exercise that involves alternating knee drives towards the chest from a plank position, engaging the core, shoulders, and legs for a full-body workout."
           }
         ]
       },
@@ -311,15 +311,15 @@
         "exercises": [
           {
             "exercise_name": "Running",
-            "exercise_description": "This is a running session"
+            "exercise_description": "A cardiovascular exercise that involves running at a steady pace to improve endurance, cardiovascular health, and overall fitness."
           },
           {
             "exercise_name": "Squat Jumps",
-            "exercise_description": "This is a squat jump exercise"
+            "exercise_description": "A plyometric exercise that combines a squat with a jump to enhance lower body strength, power, and cardiovascular fitness."
           },
           {
             "exercise_name": "Plank Jacks",
-            "exercise_description": "This is a plank jack exercise"
+            "exercise_description": "A dynamic core exercise that combines a plank position with jumping the feet in and out, targeting the core, shoulders, and cardiovascular system."
           }
         ]
       },
@@ -330,15 +330,15 @@
         "exercises": [
           {
             "exercise_name": "Rowing",
-            "exercise_description": "This is a rowing session"
+            "exercise_description": "A full-body cardiovascular exercise that simulates the action of rowing a boat, engaging the legs, core, and upper body to improve endurance and strength."
           },
           {
             "exercise_name": "Jumping Lunges",
-            "exercise_description": "This is a jumping lunge exercise"
+            "exercise_description": "A plyometric exercise that combines lunges with a jump to enhance lower body strength, power, and cardiovascular fitness. It involves alternating legs in a lunge position while jumping explosively."
           },
           {
             "exercise_name": "Spiderman Planks",
-            "exercise_description": "This is a spiderman plank exercise"
+            "exercise_description": "A dynamic core exercise that involves bringing the knee towards the elbow while maintaining a plank position, targeting the obliques, shoulders, and overall core stability."
           }
         ]
       }

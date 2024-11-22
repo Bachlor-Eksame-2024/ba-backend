@@ -1,6 +1,6 @@
 import os
 import json
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from database import get_db
 from sqlalchemy.orm import Session
@@ -85,12 +85,9 @@ async def initialize_workouts(
 
 
 @workout_router.get("/get-workouts")
-async def get_workouts(
-   # current_user: dict = Depends(get_current_user), 
-   db: Session = Depends(get_db)
-):
+async def get_workouts(db: Session = Depends(get_db)):
     workouts = db.query(Workout).all()
-    
+
     # Convert workouts to dictionary format
     workout_list = []
     for workout in workouts:
@@ -102,32 +99,31 @@ async def get_workouts(
             "workout_image": workout.workout_image,
             "created_at": workout.created_at.isoformat(),
             "updated_at": workout.updated_at.isoformat(),
-            "workout_weeks": []
+            "workout_weeks": [],
         }
-        
+
         # Add weeks for each workout
         for week in workout.workout_weeks:
             week_dict = {
                 "week_id": week.week_id,
                 "week_name": week.week_name,
                 "week_description": week.week_description,
-                "exercises": []  # Initialize exercises list
+                "exercises": [],  # Initialize exercises list
             }
-            
+
             # Query and add exercises for this week
-            exercises = db.query(Exercise).filter(Exercise.week_id == week.week_id).all()
+            exercises = (
+                db.query(Exercise).filter(Exercise.week_id == week.week_id).all()
+            )
             for exercise in exercises:
                 exercise_dict = {
                     "exercise_name": exercise.exercise_name,
-                    "exercise_description": exercise.exercise_description
+                    "exercise_description": exercise.exercise_description,
                 }
                 week_dict["exercises"].append(exercise_dict)
-                
+
             workout_dict["workout_weeks"].append(week_dict)
-            
+
         workout_list.append(workout_dict)
-    
-    return JSONResponse(
-        {"workouts": workout_list}, 
-        status_code=200
-    )
+
+    return JSONResponse({"workouts": workout_list}, status_code=200)

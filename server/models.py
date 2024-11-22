@@ -25,4 +25,4 @@ class User(Base):
     updated_at = Column(DateTime, default=datetime.now(timezone.utc))
 
     # Relationship example
-    items = relationship("Item", back_populates="owner")
+    #items = relationship("Item", back_populates="owner")

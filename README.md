@@ -23,3 +23,14 @@ Besøg `http://localhost:3000/docs` for at se API i vores database VIA Swagger U
       "source.organizeImports": "explicit"
     }
   },` ind i settings.json filen som nu skulle være åben. Genstart Vs code
+
+
+  ### Running nginx
+
+  dev: ENVIRONMENT=dev docker compose up
+
+  prod: ENVIRONMENT=prod docker compose --profile prod up
+
+  Nginx serves the built frontend from the /frontend folder on port 80.
+  The backend/fastapi is served on port 80/api, so in dev localhost/api on production
+  wwww.domain.com/api

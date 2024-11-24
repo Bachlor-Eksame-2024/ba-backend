@@ -1,10 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 
 # from sqlalchemy.orm import Session
-from database import SessionLocal, engine, Base
+from database import SessionLocal, engine, Base, get_api_key
 from authentication.authentications import authentication_router
 from workouts.workout import workout_router
 from fastapi.middleware.cors import CORSMiddleware
+
 # import models
 import os
 
@@ -12,7 +13,7 @@ import os
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(debug=True)
+app = FastAPI(debug=True, dependencies=[Depends(get_api_key)])
 origins = [
     "http://localhost:5173",
     "http://localhost",
@@ -42,9 +43,7 @@ if os.getenv("ENABLE_USER_AUTH", "true") == "true":
         authentication_router, prefix="/api/auth", tags=["User Authentication"]
     )
 if os.getenv("ENABLE_WORKOUT", "true") == "true":
-    app.include_router(
-        workout_router, prefix="/api/workout", tags=["Workouts"]
-    )
+    app.include_router(workout_router, prefix="/api/workout", tags=["Workouts"])
 
 
 @app.get("/")

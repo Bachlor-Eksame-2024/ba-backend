@@ -5,8 +5,9 @@ from fastapi.responses import JSONResponse
 from database import get_db
 from sqlalchemy.orm import Session
 from authentication.jwt import get_current_user
-from datetime import datetime
+from typing import List
 from models import Workout, Week, Exercise
+from workouts.types.workout_types import CreateWorkout
 
 
 workout_router = APIRouter()
@@ -124,18 +125,24 @@ async def get_workouts(db: Session = Depends(get_db)):
 
 @workout_router.post("/create-workout")
 async def create_workout(
-    request: Request,
+    workout_data: List[CreateWorkout],
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    workout_data = await request.json()
-    load_workouts(db, workout_data)
-    return JSONResponse({"message": "Workout created successfully", "workout": workout_data}, status_code=200)
+    # Convert the Pydantic models to dictionaries
+    workout_data_dicts = [workout.model_dump() for workout in workout_data]
+    # Pass the converted dictionaries to load_workouts
+    load_workouts(db, workout_data_dicts)
+    return JSONResponse(
+        {"message": "Workout created successfully", "workout": workout_data_dicts},
+        status_code=200,
+    )
+
 
 @workout_router.delete("/delete-workout/{workout_id}")
 async def delete_workout(
     workout_id: int,
-    current_user: dict = Depends(get_current_user),
+    #current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     workout = db.query(Workout).get(workout_id)

@@ -4,6 +4,7 @@ from fastapi import FastAPI, Depends
 from database import SessionLocal, engine, Base, get_api_key
 from authentication.authentications import authentication_router
 from workouts.workout import workout_router
+from stripe_payments.payments import payments_router
 from fastapi.middleware.cors import CORSMiddleware
 
 # import models
@@ -42,6 +43,9 @@ if os.getenv("ENABLE_USER_AUTH", "true") == "true":
     app.include_router(
         authentication_router, prefix="/api/auth", tags=["User Authentication"]
     )
+if os.getenv("ENABLE_PAYMENTS", "true") == "true":
+    app.include_router(payments_router, prefix="/api/payment", tags=["Stripe Payments"])
+
 if os.getenv("ENABLE_WORKOUT", "true") == "true":
     app.include_router(workout_router, prefix="/api/workout", tags=["Workouts"])
 

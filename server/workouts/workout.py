@@ -1,6 +1,6 @@
 import os
 import json
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 from database import get_db
 from sqlalchemy.orm import Session
@@ -142,13 +142,15 @@ async def create_workout(
 @workout_router.delete("/delete-workout/{workout_id}")
 async def delete_workout(
     workout_id: int,
-    #current_user: dict = Depends(get_current_user),
+    # current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     workout = db.query(Workout).get(workout_id)
     if workout:
         db.delete(workout)
         db.commit()
-        return JSONResponse({"message": "Workout deleted successfully"}, status_code=200)
+        return JSONResponse(
+            {"message": "Workout deleted successfully"}, status_code=200
+        )
     else:
         return JSONResponse({"error": "Workout not found"}, status_code=404)

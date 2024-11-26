@@ -18,7 +18,7 @@ class User(Base):
     hashed_password = Column(String)
     first_name = Column(String)
     last_name = Column(String)
-    #fitness_center_id = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"))
+    # fitness_center_id = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"))
     role = Column(String)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))

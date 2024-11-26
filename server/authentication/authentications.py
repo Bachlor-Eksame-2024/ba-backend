@@ -6,7 +6,7 @@ from datetime import timedelta
 from .jwt import create_access_token, get_current_user
 from authentication.types.auth_classes import SignupUser, LoginUser
 from database import get_db
-from models import User
+from models import Users
 
 authentication_router = APIRouter()
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
@@ -107,7 +107,7 @@ async def change_password(
 ):
 
     # Get all the users from the database
-    db_users = db.query(User).all()
+    db_users = db.query(Users).all()
     # Print the users to the console
     for user in db_users:
         print(user.__dict__, flush=True)

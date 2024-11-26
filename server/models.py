@@ -18,23 +18,23 @@ from datetime import datetime, timezone
 ## it is used to create the database tables
 
 
-class BookingAvailability(Base):
-    __tablename__ = "booking_availablity"
+class BookingAvailabilities(Base):
+    __tablename__ = "booking_availablities"
 
     booking_availability_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
-    box_id_fk = Column(Integer, ForeignKey("box.box_id"), nullable=False)
+    box_id_fk = Column(Integer, ForeignKey("boxes.box_id"), nullable=False)
     booking_date = Column(DateTime, nullable=False)
     hour_of_day = Column(
         Integer, CheckConstraint("hour_of_day BETWEEN 0 AND 23"), nullable=False
     )
     is_available = Column(Boolean, nullable=False)
 
-    box = relationship("Box", back_populates="booking_availablity")
+    boxes = relationship("Boxes", back_populates="booking_availablities")
 
-class Box(Base):
-    __tablename__ = "box"
+class Boxes(Base):
+    __tablename__ = "boxes"
 
     box_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
@@ -49,9 +49,9 @@ class Bookings(Base):
     booking_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
-    user_id = Column(Integer, ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
     booking_box_id_fk = Column(
-        Integer, ForeignKey("box.box_id", ondelete="CASCADE"), nullable=False
+        Integer, ForeignKey("boxes.box_id", ondelete="CASCADE"), nullable=False
     )
     booking_date = Column(DateTime, nullable=False)
     booking_code = Column(String(4), nullable=False, unique=True)
@@ -72,12 +72,12 @@ class Bookings(Base):
     )
     booking_timestamp = Column(DateTime, nullable=False)
 
-    user = relationship("User", back_populates="bookings")
-    box = relationship("Box", back_populates="bookings")
+    users = relationship("Users", back_populates="bookings")
+    boxes = relationship("Boxes", back_populates="bookings")
 
 
-class User(Base):
-    __tablename__ = "user"
+class Users(Base):
+    __tablename__ = "users"
 
     user_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
@@ -88,30 +88,30 @@ class User(Base):
     user_phone = Column(String(255), nullable=False)
     create_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
-    user_role_fk = Column(Integer, ForeignKey("user_role.user_role_id"), nullable=False)
-    fitness_center_fk = Column(Integer, ForeignKey("fitness_center.fitness_center_id"), nullable=False)
-    user_bookings_fk = Column(Integer, ForeignKey("booking.booking_id"), nullable=False)
+    user_role_fk = Column(Integer, ForeignKey("user_roles.user_role_id"), nullable=False)
+    fitness_center_fk = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"), nullable=False)
+    user_bookings_fk = Column(Integer, ForeignKey("bookings.booking_id"), nullable=False)
 
-    bookings = relationship("Bookings", back_populates="user")
-    fitness_center = relationship("FitnessCenter", back_populates="user")
-    user_role = relationship("UserRole", back_populates="user")
+    bookings = relationship("Bookings", back_populates="users")
+    fitness_centers = relationship("FitnessCenters", back_populates="users")
+    user_roles = relationship("UserRoles", back_populates="users")
 
 
-class FitnessCenter(Base):
-    __tablename__ = "fitness_center"
+class FitnessCenters(Base):
+    __tablename__ = "fitness_centers"
 
     fitness_center_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
     fitness_center_name = Column(String(255), nullable=False)
     fitness_center_address = Column(String(255), nullable=False)
-    fitness_boxes_fk = Column(Integer, ForeignKey("box.box_id"), nullable=False)
+    fitness_boxes_fk = Column(Integer, ForeignKey("boxes.box_id"), nullable=False)
     
-    box = relationship("Box", back_populates="fitness_center")
+    boxes = relationship("Boxes", back_populates="fitness_centers")
 
 
-class UserRole(Base):
-    __tablename__ = "user_role"
+class UserRoles(Base):
+    __tablename__ = "user_roles"
 
     user_role_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True

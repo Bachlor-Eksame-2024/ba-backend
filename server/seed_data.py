@@ -10,7 +10,7 @@ from models import (
     Bookings,
     BookingAvailabilities,
 )
-from datetime import datetime, timedelta
+from datetime import datetime
 import random
 import string
 from typing import List

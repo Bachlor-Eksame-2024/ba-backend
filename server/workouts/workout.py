@@ -5,52 +5,46 @@ from fastapi.responses import JSONResponse
 from database import get_db
 from sqlalchemy.orm import Session
 from authentication.jwt import get_current_user
-from datetime import datetime
+from typing import List
 from models import Workout, Week, Exercise
+from workouts.types.workout_types import CreateWorkout
+
 
 workout_router = APIRouter()
 
 
+# Update load_workouts function
 def load_workouts(session: Session, data: list):
-    week_id_counter = 1  # Counter for generating unique week_ids
-
     for workout_data in data:
-        # Create workout
+        # Create workout without ID
         workout = Workout(
-            workout_id=int(workout_data["workout_id"]),
             workout_name=workout_data["workout_name"],
             workout_description=workout_data["workout_description"],
             workout_level=workout_data["workout_level"],
             workout_image=workout_data.get("workout_image"),
-            created_at=datetime.fromisoformat(
-                workout_data["created_at"].replace("Z", "+00:00")
-            ),
-            updated_at=datetime.fromisoformat(
-                workout_data["updated_at"].replace("Z", "+00:00")
-            ),
+            # created_at and updated_at will be set automatically
         )
         session.add(workout)
+        session.flush()  # Get the generated workout_id
 
-        # Create weeks for each workout with unique week_ids
+        # Create weeks without week_id
         for week_data in workout_data["workout_weeks"]:
             week = Week(
-                week_id=week_id_counter,  # Use counter instead of week_data["week_id"]
-                workout_id=int(workout_data["workout_id"]),
+                workout_id=workout.workout_id,  # Use the generated workout_id
                 week_name=week_data["week_name"],
                 week_description=week_data["week_description"],
             )
             session.add(week)
+            session.flush()  # Get the generated week_id
 
-            # Create exercises for each week
+            # Create exercises
             for exercise_data in week_data["exercises"]:
                 exercise = Exercise(
-                    week_id=week_id_counter,  # Use the same counter for exercises
+                    week_id=week.week_id,  # Use the generated week_id
                     exercise_name=exercise_data["exercise_name"],
                     exercise_description=exercise_data["exercise_description"],
                 )
                 session.add(exercise)
-
-            week_id_counter += 1  # Increment counter after each week
 
     session.commit()
 
@@ -127,3 +121,36 @@ async def get_workouts(db: Session = Depends(get_db)):
         workout_list.append(workout_dict)
 
     return JSONResponse({"workouts": workout_list}, status_code=200)
+
+
+@workout_router.post("/create-workout")
+async def create_workout(
+    workout_data: List[CreateWorkout],
+    current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    # Convert the Pydantic models to dictionaries
+    workout_data_dicts = [workout.model_dump() for workout in workout_data]
+    # Pass the converted dictionaries to load_workouts
+    load_workouts(db, workout_data_dicts)
+    return JSONResponse(
+        {"message": "Workout created successfully", "workout": workout_data_dicts},
+        status_code=200,
+    )
+
+
+@workout_router.delete("/delete-workout/{workout_id}")
+async def delete_workout(
+    workout_id: int,
+    # current_user: dict = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    workout = db.query(Workout).get(workout_id)
+    if workout:
+        db.delete(workout)
+        db.commit()
+        return JSONResponse(
+            {"message": "Workout deleted successfully"}, status_code=200
+        )
+    else:
+        return JSONResponse({"error": "Workout not found"}, status_code=404)

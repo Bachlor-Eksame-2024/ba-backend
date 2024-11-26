@@ -1,4 +1,13 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Text
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    DateTime,
+    Boolean,
+    ForeignKey,
+    Text,
+    CheckConstraint,
+)
 from sqlalchemy.orm import relationship
 from database import Base
 from datetime import datetime, timezone
@@ -9,23 +18,105 @@ from datetime import datetime, timezone
 ## it is used to create the database tables
 
 
-## User model - represents the users table in the database boksfit
+class BookingAvailability(Base):
+    __tablename__ = "booking_availablity"
+
+    booking_availability_id = Column(
+        Integer, primary_key=True, autoincrement=True, index=True, unique=True
+    )
+    box_id_fk = Column(Integer, ForeignKey("box.box_id"), nullable=False)
+    booking_date = Column(DateTime, nullable=False)
+    hour_of_day = Column(
+        Integer, CheckConstraint("hour_of_day BETWEEN 0 AND 23"), nullable=False
+    )
+    is_available = Column(Boolean, nullable=False)
+
+    box = relationship("Box", back_populates="booking_availablity")
+
+class Box(Base):
+    __tablename__ = "box"
+
+    box_id = Column(
+        Integer, primary_key=True, autoincrement=True, index=True, unique=True
+    )
+    box_number = Column(Integer, nullable=False, autoincrement=True, unique=True)
+    created_at = Column(DateTime, nullable=False)
+
+
+class Bookings(Base):
+    __tablename__ = "bookings"
+
+    booking_id = Column(
+        Integer, primary_key=True, autoincrement=True, index=True, unique=True
+    )
+    user_id = Column(Integer, ForeignKey("user.user_id", ondelete="CASCADE"), nullable=False)
+    booking_box_id_fk = Column(
+        Integer, ForeignKey("box.box_id", ondelete="CASCADE"), nullable=False
+    )
+    booking_date = Column(DateTime, nullable=False)
+    booking_code = Column(String(4), nullable=False, unique=True)
+    booking_start_hour = Column(
+        Integer,
+        CheckConstraint("booking_start_hour >= 0 AND booking_start_hour <= 23"),
+        nullable=False,
+    )
+    booking_duration_hours = Column(
+        Integer,
+        CheckConstraint("booking_duration_hours >= 1 AND booking_duration_hours <= 4"),
+        nullable=False,
+    )
+    booking_end_hour = Column(
+        Integer,
+        CheckConstraint("booking_end_hour >= 0 AND booking_end_hour <= 23"),
+        nullable=False,
+    )
+    booking_timestamp = Column(DateTime, nullable=False)
+
+    user = relationship("User", back_populates="bookings")
+    box = relationship("Box", back_populates="bookings")
+
+
 class User(Base):
-    __tablename__ = "users"
+    __tablename__ = "user"
 
-    user_id = Column(Integer, primary_key=True, index=True)
-    email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
-    first_name = Column(String)
-    last_name = Column(String)
-    #fitness_center_id = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"))
-    role = Column(String)
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
-    updated_at = Column(DateTime, default=datetime.now(timezone.utc))
+    user_id = Column(
+        Integer, primary_key=True, autoincrement=True, index=True, unique=True
+    )
+    user_first_name = Column(String(255), nullable=False)
+    user_last_name = Column(String(255), nullable=False)
+    password_hash = Column(String, nullable=False)
+    user_phone = Column(String(255), nullable=False)
+    create_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+    user_role_fk = Column(Integer, ForeignKey("user_role.user_role_id"), nullable=False)
+    fitness_center_fk = Column(Integer, ForeignKey("fitness_center.fitness_center_id"), nullable=False)
+    user_bookings_fk = Column(Integer, ForeignKey("booking.booking_id"), nullable=False)
 
-    # Relationship example
-    # items = relationship("Item", back_populates="owner")
+    bookings = relationship("Bookings", back_populates="user")
+    fitness_center = relationship("FitnessCenter", back_populates="user")
+    user_role = relationship("UserRole", back_populates="user")
+
+
+class FitnessCenter(Base):
+    __tablename__ = "fitness_center"
+
+    fitness_center_id = Column(
+        Integer, primary_key=True, autoincrement=True, index=True, unique=True
+    )
+    fitness_center_name = Column(String(255), nullable=False)
+    fitness_center_address = Column(String(255), nullable=False)
+    fitness_boxes_fk = Column(Integer, ForeignKey("box.box_id"), nullable=False)
+    
+    box = relationship("Box", back_populates="fitness_center")
+
+
+class UserRole(Base):
+    __tablename__ = "user_role"
+
+    user_role_id = Column(
+        Integer, primary_key=True, autoincrement=True, index=True, unique=True
+    )
+    role_name = Column(String(255), nullable=False)
 
 
 ##### WORKOUTS #####

@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 
 
 class BookingAvailabilities(Base):
-    __tablename__ = "booking_availablities"
+    __tablename__ = "booking_availabilities"  # Fixed typo in table name
 
     booking_availability_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
@@ -31,7 +31,10 @@ class BookingAvailabilities(Base):
     )
     is_available = Column(Boolean, nullable=False)
 
-    boxes = relationship("Boxes", back_populates="booking_availablities")
+    box = relationship(
+        "Boxes", back_populates="booking_availabilities"
+    )  # Changed to singular 'box'
+
 
 class Boxes(Base):
     __tablename__ = "boxes"
@@ -41,6 +44,12 @@ class Boxes(Base):
     )
     box_number = Column(Integer, nullable=False, autoincrement=True, unique=True)
     created_at = Column(DateTime, nullable=False)
+    fitness_center_id = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"), nullable=False)
+
+    # Add this relationship
+    booking_availabilities = relationship("BookingAvailabilities", back_populates="box")
+    bookings = relationship("Bookings", back_populates="boxes")
+    fitness_center = relationship("FitnessCenters", back_populates="boxes")
 
 
 class Bookings(Base):
@@ -49,7 +58,9 @@ class Bookings(Base):
     booking_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
-    user_id = Column(Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(
+        Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
+    )
     booking_box_id_fk = Column(
         Integer, ForeignKey("boxes.box_id", ondelete="CASCADE"), nullable=False
     )
@@ -72,7 +83,7 @@ class Bookings(Base):
     )
     booking_timestamp = Column(DateTime, nullable=False)
 
-    users = relationship("Users", back_populates="bookings")
+    user = relationship("Users", back_populates="bookings")  # Changed to singular
     boxes = relationship("Boxes", back_populates="bookings")
 
 
@@ -86,15 +97,20 @@ class Users(Base):
     user_last_name = Column(String(255), nullable=False)
     password_hash = Column(String, nullable=False)
     user_phone = Column(String(255), nullable=False)
-    create_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
-    user_role_fk = Column(Integer, ForeignKey("user_roles.user_role_id"), nullable=False)
-    fitness_center_fk = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"), nullable=False)
-    user_bookings_fk = Column(Integer, ForeignKey("bookings.booking_id"), nullable=False)
+    user_role_fk = Column(
+        Integer, ForeignKey("user_roles.user_role_id"), nullable=False
+    )
+    fitness_center_fk = Column(
+        Integer, ForeignKey("fitness_centers.fitness_center_id"), nullable=False
+    )
+    # Remove user_bookings_fk as it's not needed
 
-    bookings = relationship("Bookings", back_populates="users")
-    fitness_centers = relationship("FitnessCenters", back_populates="users")
-    user_roles = relationship("UserRoles", back_populates="users")
+    # One-to-many relationship with Bookings
+    bookings = relationship("Bookings", back_populates="user")
+    fitness_center = relationship("FitnessCenters", back_populates="users")
+    user_role = relationship("UserRoles", back_populates="users")
 
 
 class FitnessCenters(Base):
@@ -105,9 +121,10 @@ class FitnessCenters(Base):
     )
     fitness_center_name = Column(String(255), nullable=False)
     fitness_center_address = Column(String(255), nullable=False)
-    fitness_boxes_fk = Column(Integer, ForeignKey("boxes.box_id"), nullable=False)
-    
-    boxes = relationship("Boxes", back_populates="fitness_centers")
+    # fitness_boxes_fk = Column(Integer, ForeignKey("boxes.box_id"), nullable=False)
+
+    boxes = relationship("Boxes", back_populates="fitness_center")
+    users = relationship("Users", back_populates="fitness_center")
 
 
 class UserRoles(Base):
@@ -117,7 +134,7 @@ class UserRoles(Base):
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
     role_name = Column(String(255), nullable=False)
-
+    users = relationship("Users", back_populates="user_role")
 
 ##### WORKOUTS #####
 

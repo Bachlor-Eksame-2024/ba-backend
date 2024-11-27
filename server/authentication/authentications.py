@@ -4,7 +4,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from datetime import timedelta, datetime, timezone
 from .jwt import create_access_token, get_current_user
-from authentication.types.auth_classes import SignupUser, LoginUser, User
+from authentication.types.auth_classes import SignupUser, LoginUser
 from database import get_db
 from models import Users
 
@@ -76,13 +76,12 @@ async def signup(user: SignupUser):
 
 ##### REAL SIGN UP #####
 @authentication_router.post("/signupp")
+
 async def signupp(user: SignupUser, db: Session = Depends(get_db)):
     # Hash password
     hash_password = pwd_context.hash(user.password)
-    
     # Get current timestamp
     current_time = datetime.now(timezone.utc)
-    
     # Create new user model instance with all required fields
     new_user = Users(
         user_email=user.email,
@@ -96,16 +95,15 @@ async def signupp(user: SignupUser, db: Session = Depends(get_db)):
         updated_at=current_time,
         user_phone=user.phone  # Ensure `phone` is a field in `SignupUser`
     )
-     
     # Add and commit to database
     db.add(new_user)
     try:
         db.commit()
         db.refresh(new_user)
     except Exception as e:
+        print(f"Error creating user: {e}")
         db.rollback()
         raise HTTPException(status_code=400, detail="Error creating user")
-
     # Create user info dict from saved user
     user_info = {
         "email": new_user.user_email,

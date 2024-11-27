@@ -125,7 +125,7 @@ class FitnessCenters(Base):
 
     boxes = relationship("Boxes", back_populates="fitness_center")
     users = relationship("Users", back_populates="fitness_center")
-
+    
 
 class UserRoles(Base):
     __tablename__ = "user_roles"

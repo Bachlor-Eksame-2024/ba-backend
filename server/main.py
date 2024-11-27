@@ -1,11 +1,11 @@
 from fastapi import FastAPI, Depends
-
+from fastapi.middleware.cors import CORSMiddleware
 # from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base, get_api_key
 from authentication.authentications import authentication_router
 from workouts.workout import workout_router
 from stripe_payments.payments import payments_router
-from fastapi.middleware.cors import CORSMiddleware
+from seed_data import seed_router
 
 # import models
 import os
@@ -49,6 +49,7 @@ if os.getenv("ENABLE_PAYMENTS", "true") == "true":
 if os.getenv("ENABLE_WORKOUT", "true") == "true":
     app.include_router(workout_router, prefix="/api/workout", tags=["Workouts"])
 
+app.include_router(seed_router, prefix="/api/seed", tags=["Database Seeding"])
 
 @app.get("/")
 def read_root():

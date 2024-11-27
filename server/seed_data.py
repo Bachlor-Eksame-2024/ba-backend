@@ -60,7 +60,7 @@ def create_fitness_centers(db: Session, num_centers: int = 2):
     return centers
 
 
-def create_users(db: Session, centers, roles, num_users: int = 10):
+def create_users(db: Session, centers, roles, num_users: int = 100):
     users = []
     for _ in range(num_users):
         user = Users(
@@ -74,7 +74,7 @@ def create_users(db: Session, centers, roles, num_users: int = 10):
             updated_at=datetime.now(),
             user_role_fk=random.choice(roles).user_role_id,
             fitness_center_fk=random.choice(centers).fitness_center_id,
-            #user_bookings_fk=None,
+            # user_bookings_fk=None,
         )
         db.add(user)
         db.flush()

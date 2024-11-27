@@ -21,6 +21,7 @@ class SignupUser(BaseModel):
     first_name: str
     last_name: str
     fitness_center_id: str
+    phone: str
 
 
 class LoginUser(BaseModel):

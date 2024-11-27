@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import SessionLocal, engine, Base, get_api_key
 from authentication.authentications import authentication_router
 from workouts.workout import workout_router
+from admin.admin import admin_router
 from stripe_payments.payments import payments_router
 from seed_data import seed_router
 
@@ -49,6 +50,10 @@ if os.getenv("ENABLE_PAYMENTS", "true") == "true":
 if os.getenv("ENABLE_WORKOUT", "true") == "true":
     app.include_router(workout_router, prefix="/api/workout", tags=["Workouts"])
 
+if os.getenv("ENABLE_ADMIN", "true") == "true":
+    app.include_router(admin_router, prefix="/api/admin", tags=["Admin Requests"])
+
+# Add the seed router to the app
 app.include_router(seed_router, prefix="/api/seed", tags=["Database Seeding"])
 
 @app.get("/")

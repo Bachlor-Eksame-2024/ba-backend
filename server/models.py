@@ -93,8 +93,10 @@ class Users(Base):
     user_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
+    user_email = Column(String(255), nullable=False, unique=True)
     user_first_name = Column(String(255), nullable=False)
     user_last_name = Column(String(255), nullable=False)
+    is_member = Column(Boolean, nullable=False, default=True)
     password_hash = Column(String, nullable=False)
     user_phone = Column(String(255), nullable=False)
     created_at = Column(DateTime, nullable=False)

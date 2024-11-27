@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from .jwt import create_access_token, get_current_user
 from authentication.types.auth_classes import SignupUser, LoginUser
 from database import get_db
@@ -74,6 +74,60 @@ async def signup(user: SignupUser):
     ## return the response with the JWT token
     return response
 
+##### REAL SIGN UP #####
+@authentication_router.post("/signupp")  
+async def signupp(user: SignupUser, db: Session = Depends(get_db)):
+    # Hash password
+    hash_password = pwd_context.hash(user.password)
+    # Get current timestamp
+    current_time = datetime.now(timezone.utc)
+    # Create new user model instance with all required fields
+    new_user = Users(
+        user_email=user.email,
+        password_hash=hash_password,
+        user_first_name=user.first_name,
+        user_last_name=user.last_name,
+        fitness_center_fk=user.fitness_center_id,
+        user_role_fk=1,  # Assuming default role id is 1
+        is_member=True,
+        created_at=current_time,
+        updated_at=current_time,
+        user_phone=user.phone  # Ensure `phone` is a field in `SignupUser`
+    )
+    # Add and commit to database
+    db.add(new_user)
+    try:
+        db.commit()
+        db.refresh(new_user)
+    except Exception as e:
+        print(f"Error creating user: {e}")
+        db.rollback()
+        raise HTTPException(status_code=400, detail="Error creating user")
+    # Create user info dict from saved user
+    user_info = {
+        "email": new_user.user_email,
+        "first_name": new_user.user_first_name,
+        "last_name": new_user.user_last_name,
+        "fitness_center_id": new_user.fitness_center_fk,
+        "user_id": new_user.user_id
+    }
+
+    # Generate JWT token
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user_info}, expires_delta=access_token_expires
+    )
+
+    # Create response
+    response = JSONResponse({"user": user_info}, status_code=201)
+    response.set_cookie(
+        key="fitboks-auth-Token",
+        value=access_token,
+        httponly=True,
+        samesite="Strict", 
+        secure=True
+    )
+    return response
 
 #####
 ##### Log out Endpoint #####

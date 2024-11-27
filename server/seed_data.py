@@ -68,7 +68,8 @@ def create_users(db: Session, centers, roles, num_users: int = 10):
             user_last_name=fake.last_name(),
             user_email=fake.email(),
             is_member=True,
-            password_hash="$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewKxcQw8.CKYlB.m",  # 'password'
+            password_hash="$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewKxcQw8.CKYlB.m",
+            #'password'
             user_phone=fake.phone_number(),
             created_at=datetime.now(),
             updated_at=datetime.now(),

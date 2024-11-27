@@ -75,8 +75,7 @@ async def signup(user: SignupUser):
     return response
 
 ##### REAL SIGN UP #####
-@authentication_router.post("/signupp")
-
+@authentication_router.post("/signupp")  
 async def signupp(user: SignupUser, db: Session = Depends(get_db)):
     # Hash password
     hash_password = pwd_context.hash(user.password)
@@ -128,7 +127,6 @@ async def signupp(user: SignupUser, db: Session = Depends(get_db)):
         samesite="Strict", 
         secure=True
     )
-
     return response
 
 #####

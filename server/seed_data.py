@@ -47,17 +47,28 @@ def create_boxes(
     return boxes
 
 
-def create_fitness_centers(db: Session, num_centers: int = 2):
-    centers = []
-    for i in range(num_centers):
+def create_fitness_centers(db: Session):
+    centers_names = [
+        "Fitness X",
+        "SATS",
+        "Puregym",
+        "Fit & Sund",
+        "Loop Fitness",
+        "Copenhagen Gym",
+        "Power House",
+        "Ground",
+    ]
+
+    created_centers = []
+    for center_name in centers_names:
         center = FitnessCenters(
-            fitness_center_name=f"{fake.company()} Fitness",
-            fitness_center_address=fake.address(),
+            fitness_center_name=center_name, fitness_center_address=fake.address()
         )
         db.add(center)
-        db.flush()
-        centers.append(center)
-    return centers
+        created_centers.append(center)
+
+    db.commit()
+    return created_centers
 
 
 def create_users(db: Session, centers, roles, num_users: int = 100):

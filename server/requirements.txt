@@ -7,7 +7,7 @@ python-dotenv>=0.19.0
 motor
 pydantic[email]  # For handling data validation and parsing
 python-multipart # For handling form data
-passlib[bcrypt]  # For hashing passwords
+passlib[bcrypt] >= 1.7.4  # For hashing passwords
 pyjwt  # For handling JWT tokens
 pytest # For running tests
 pytest-cov # For running tests and generating coverage reports

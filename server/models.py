@@ -43,9 +43,11 @@ class Boxes(Base):
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
     box_number = Column(Integer, nullable=False, autoincrement=True, unique=True)
+    box_availability = Column(String(255), nullable=False)
     created_at = Column(DateTime, nullable=False)
-    fitness_center_id = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"), 
-                               nullable=False)
+    fitness_center_id = Column(
+        Integer, ForeignKey("fitness_centers.fitness_center_id"), nullable=False
+    )
 
     # Add this relationship
     booking_availabilities = relationship("BookingAvailabilities", back_populates="box")
@@ -100,6 +102,8 @@ class Users(Base):
     is_member = Column(Boolean, nullable=False, default=True)
     password_hash = Column(String, nullable=False)
     user_phone = Column(String(255), nullable=False)
+    is_verified = Column(Boolean, default=False)
+    verification_token = Column(String, nullable=True)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
     user_role_fk = Column(
@@ -127,7 +131,7 @@ class FitnessCenters(Base):
     # fitness_boxes_fk = Column(Integer, ForeignKey("boxes.box_id"), nullable=False)
     boxes = relationship("Boxes", back_populates="fitness_center")
     users = relationship("Users", back_populates="fitness_center")
-    
+
 
 class UserRoles(Base):
     __tablename__ = "user_roles"
@@ -137,6 +141,7 @@ class UserRoles(Base):
     )
     role_name = Column(String(255), nullable=False)
     users = relationship("Users", back_populates="user_role")
+
 
 ##### WORKOUTS #####
 

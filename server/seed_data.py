@@ -29,7 +29,7 @@ def create_user_roles(db: Session):
 
 
 def create_boxes(
-    db: Session, fitness_centers: List[FitnessCenters], num_boxes: int = 5
+    db: Session, fitness_centers: List[FitnessCenters], num_boxes: int = 20
 ):
     boxes = []
     # Distribute boxes evenly among fitness centers
@@ -37,6 +37,7 @@ def create_boxes(
         box = Boxes(
             box_number=i + 1,
             created_at=datetime.now(),
+            box_availability="available",
             fitness_center_id=fitness_centers[
                 i % len(fitness_centers)
             ].fitness_center_id,
@@ -80,7 +81,8 @@ def create_users(db: Session, centers, roles, num_users: int = 100):
             user_email=fake.email(),
             is_member=True,
             password_hash="$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewKxcQw8.CKYlB.m",
-            #'password'
+            is_verified=True,
+            verification_token=None,
             user_phone=fake.phone_number(),
             created_at=datetime.now(),
             updated_at=datetime.now(),

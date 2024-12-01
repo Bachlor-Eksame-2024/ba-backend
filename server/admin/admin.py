@@ -2,11 +2,12 @@ from fastapi import APIRouter, Depends, Query, Body, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from datetime import datetime
+from datetime import datetime, timedelta
+from collections import defaultdict
 from math import ceil
 from database import get_db
 from authentication.jwt import get_current_user
-from models import Users, UserRoles, Bookings
+from models import Users, UserRoles, Bookings, FitnessCenters, Boxes
 
 admin_router = APIRouter(dependencies=[Depends(get_current_user)])
 
@@ -255,9 +256,11 @@ def get_stats(
             .count()
         )
 
-        # Total users (boks)
+        # Total Fitness Center boxes (boks)
         total_boks = (
-            db.query(Users).filter(Users.fitness_center_fk == fitness_center_id).count()
+            db.query(Boxes)
+            .filter(Boxes.fitness_center_fk == fitness_center_id)
+            .count()
         )
 
         # Bookings checked in today
@@ -271,16 +274,41 @@ def get_stats(
             .count()
         )
 
-        # Bookings checked in this month
-        boks_checked_in_month = (
-            db.query(Bookings)
+        # Get date range
+        today = datetime.now().date()
+        thirty_days_ago = today - timedelta(days=30)
+
+        # Get bookings grouped by date
+        daily_bookings = (
+            db.query(
+                func.date(Bookings.booking_date).label("date"),
+                func.count().label("count"),
+            )
             .join(Users)
             .filter(
                 Users.fitness_center_fk == fitness_center_id,
-                func.date(Bookings.booking_date) >= first_day_of_month,
+                func.date(Bookings.booking_date) >= thirty_days_ago,
+                func.date(Bookings.booking_date) <= today,
             )
-            .count()
+            .group_by(func.date(Bookings.booking_date))
+            .all()
         )
+
+        # Create dict with all dates initialized to 0
+        booking_dict = defaultdict(int)
+        current_date = thirty_days_ago
+        while current_date <= today:
+            booking_dict[current_date.strftime("%Y-%m-%d")] = 0
+            current_date += timedelta(days=1)
+
+        # Fill in actual booking counts
+        for date, count in daily_bookings:
+            booking_dict[date.strftime("%Y-%m-%d")] = count
+
+        # Convert to array of objects
+        daily_stats = [
+            {"date": date, "count": count} for date, count in booking_dict.items()
+        ]
 
         return {
             "new_members_month": new_members,
@@ -288,7 +316,7 @@ def get_stats(
             "total_members": total_members,
             "total_boks": total_boks,
             "checked_in_today": boks_checked_in_today,
-            "checked_in_month": boks_checked_in_month,
+            "daily_bookings": daily_stats,
         }
 
     except Exception as e:

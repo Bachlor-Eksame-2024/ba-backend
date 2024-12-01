@@ -44,7 +44,7 @@ class Boxes(Base):
     )
     box_number = Column(Integer, nullable=False, autoincrement=True, unique=True)
     created_at = Column(DateTime, nullable=False)
-    fitness_center_id = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"), 
+    fitness_center_fk = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"), 
                                nullable=False)
 
     # Add this relationship

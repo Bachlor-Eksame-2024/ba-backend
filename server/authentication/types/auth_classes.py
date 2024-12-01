@@ -27,4 +27,3 @@ class SignupUser(BaseModel):
 class LoginUser(BaseModel):
     email: str
     password: str
-    fitness_center_id: str

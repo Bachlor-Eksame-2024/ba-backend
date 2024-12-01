@@ -25,7 +25,7 @@ async def login(user: LoginUser):
         "email": user.email,
         "first_name": "Jaime",
         "first_last": "Lannister",
-        "fitness_center_id": user.fitness_center_id,
+        "fitness_center_id": "Sats",
         "user_id": "A random user id",
     }
     ## JWT token creation
@@ -74,8 +74,9 @@ async def signup(user: SignupUser):
     ## return the response with the JWT token
     return response
 
+
 ##### REAL SIGN UP #####
-@authentication_router.post("/signupp")  
+@authentication_router.post("/signupp")
 async def signupp(user: SignupUser, db: Session = Depends(get_db)):
     # Hash password
     hash_password = pwd_context.hash(user.password)
@@ -92,7 +93,7 @@ async def signupp(user: SignupUser, db: Session = Depends(get_db)):
         is_member=True,
         created_at=current_time,
         updated_at=current_time,
-        user_phone=user.phone  # Ensure `phone` is a field in `SignupUser`
+        user_phone=user.phone,  # Ensure `phone` is a field in `SignupUser`
     )
     # Add and commit to database
     db.add(new_user)
@@ -109,7 +110,7 @@ async def signupp(user: SignupUser, db: Session = Depends(get_db)):
         "first_name": new_user.user_first_name,
         "last_name": new_user.user_last_name,
         "fitness_center_id": new_user.fitness_center_fk,
-        "user_id": new_user.user_id
+        "user_id": new_user.user_id,
     }
 
     # Generate JWT token
@@ -124,10 +125,11 @@ async def signupp(user: SignupUser, db: Session = Depends(get_db)):
         key="fitboks-auth-Token",
         value=access_token,
         httponly=True,
-        samesite="Strict", 
-        secure=True
+        samesite="Strict",
+        secure=True,
     )
     return response
+
 
 #####
 ##### Log out Endpoint #####

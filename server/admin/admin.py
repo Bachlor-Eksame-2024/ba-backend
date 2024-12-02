@@ -1,16 +1,20 @@
 from fastapi import APIRouter, Depends, Query, Body, HTTPException, status
 from pydantic import BaseModel
-from authentication.jwt import get_current_user
-from database import get_db
 from sqlalchemy.orm import Session
-from models import Users, UserRoles
+from sqlalchemy import func
+from datetime import datetime, timedelta
+from collections import defaultdict
 from math import ceil
+from database import get_db
+from authentication.jwt import get_current_user
+from models import Users, UserRoles, Bookings, FitnessCenters, Boxes
 
 admin_router = APIRouter(dependencies=[Depends(get_current_user)])
 
 
 #######################
 #### GET ALL USERS ####
+
 
 @admin_router.get("/get-users")
 def get_all_users(
@@ -69,6 +73,7 @@ def get_all_users(
 
 ######################
 #### SEARCH USERS ####
+
 
 @admin_router.get("/search-users")
 def search_users(
@@ -155,8 +160,6 @@ def update_membership(
 
 ######################
 #### DELETE USER ####
-
-
 @admin_router.delete("/delete-user/{user_id}")
 def delete_user(
     user_id: int,
@@ -181,3 +184,140 @@ def delete_user(
     db.commit()
 
     return {"status": "success", "message": "User deleted successfully"}
+
+
+#######################
+#### GET ALL BOKS ####
+@admin_router.get("/get-boks")
+def get_all_boks(
+    db: Session = Depends(get_db),
+    fitness_center_id: int = Query(..., description="ID of the fitness center"),
+):
+    boks = db.query(Users).filter(Users.fitness_center_fk == fitness_center_id).all()
+
+    boks_list = [
+        {
+            "boks_id": boks.user_id,
+            "first_name": boks.user_first_name,
+            "last_name": boks.user_last_name,
+            "email": boks.user_email,
+            "phone": boks.user_phone,
+            "is_member": boks.is_member,
+            "role": boks.user_role,
+        }
+        for boks in boks
+    ]
+
+    return {"boks": boks_list}
+
+
+###################
+#### GET STATS ####
+
+
+@admin_router.get("/get-stats")
+def get_stats(
+    db: Session = Depends(get_db),
+    fitness_center_id: int = Query(..., description="ID of the fitness center"),
+):
+    # Get current date info
+    today = datetime.now().date()
+    first_day_of_month = today.replace(day=1)
+
+    try:
+        # New members this month (users created this month)
+        new_members = (
+            db.query(Users)
+            .filter(
+                Users.fitness_center_fk == fitness_center_id,
+                Users.is_member == True,
+                func.date(Users.created_at) >= first_day_of_month,
+            )
+            .count()
+        )
+
+        # New members today
+        new_members_today = (
+            db.query(Users)
+            .filter(
+                Users.fitness_center_fk == fitness_center_id,
+                Users.is_member == True,
+                func.date(Users.created_at) == today,
+            )
+            .count()
+        )
+
+        # Total members
+        total_members = (
+            db.query(Users)
+            .filter(
+                Users.fitness_center_fk == fitness_center_id, Users.is_member == True
+            )
+            .count()
+        )
+
+        # Total Fitness Center boxes (boks)
+        total_boks = (
+            db.query(Boxes)
+            .filter(Boxes.fitness_center_fk == fitness_center_id)
+            .count()
+        )
+
+        # Bookings checked in today
+        boks_checked_in_today = (
+            db.query(Bookings)
+            .join(Users)
+            .filter(
+                Users.fitness_center_fk == fitness_center_id,
+                func.date(Bookings.booking_date) == today,
+            )
+            .count()
+        )
+
+        # Get date range
+        today = datetime.now().date()
+        thirty_days_ago = today - timedelta(days=30)
+
+        # Get bookings grouped by date
+        daily_bookings = (
+            db.query(
+                func.date(Bookings.booking_date).label("date"),
+                func.count().label("count"),
+            )
+            .join(Users)
+            .filter(
+                Users.fitness_center_fk == fitness_center_id,
+                func.date(Bookings.booking_date) >= thirty_days_ago,
+                func.date(Bookings.booking_date) <= today,
+            )
+            .group_by(func.date(Bookings.booking_date))
+            .all()
+        )
+
+        # Create dict with all dates initialized to 0
+        booking_dict = defaultdict(int)
+        current_date = thirty_days_ago
+        while current_date <= today:
+            booking_dict[current_date.strftime("%Y-%m-%d")] = 0
+            current_date += timedelta(days=1)
+
+        # Fill in actual booking counts
+        for date, count in daily_bookings:
+            booking_dict[date.strftime("%Y-%m-%d")] = count
+
+        # Convert to array of objects
+        daily_stats = [
+            {"date": date, "count": count} for date, count in booking_dict.items()
+        ]
+
+        return {
+            "new_members_month": new_members,
+            "new_members_today": new_members_today,
+            "total_members": total_members,
+            "total_boks": total_boks,
+            "checked_in_today": boks_checked_in_today,
+            "daily_bookings": daily_stats,
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching stats: {str(e)}")

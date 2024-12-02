@@ -10,7 +10,7 @@ from models import (
     Bookings,
     BookingAvailabilities,
 )
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 import string
 from typing import List
@@ -19,6 +19,9 @@ from typing import List
 fake = Faker()
 seed_router = APIRouter()
 
+# Set the date range
+start_date = datetime.now() - timedelta(days=30)
+end_date = datetime.now() + timedelta(days=10)
 
 def create_user_roles(db: Session):
     roles = ["admin", "user"]
@@ -29,7 +32,7 @@ def create_user_roles(db: Session):
 
 
 def create_boxes(
-    db: Session, fitness_centers: List[FitnessCenters], num_boxes: int = 20
+    db: Session, fitness_centers: List[FitnessCenters], num_boxes: int = 200
 ):
     boxes = []
     # Distribute boxes evenly among fitness centers
@@ -38,7 +41,7 @@ def create_boxes(
             box_number=i + 1,
             created_at=datetime.now(),
             box_availability="available",
-            fitness_center_id=fitness_centers[
+            fitness_center_fk=fitness_centers[
                 i % len(fitness_centers)
             ].fitness_center_id,
         )
@@ -72,18 +75,18 @@ def create_fitness_centers(db: Session):
     return created_centers
 
 
-def create_users(db: Session, centers, roles, num_users: int = 100):
+def create_users(db: Session, centers, roles, num_users: int = 1000):
     users = []
     for _ in range(num_users):
         user = Users(
             user_first_name=fake.first_name(),
             user_last_name=fake.last_name(),
-            user_email=fake.email(),
+            user_email=fake.unique.email(),
             is_member=True,
             password_hash="$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewKxcQw8.CKYlB.m",
             is_verified=True,
             verification_token=None,
-            user_phone=fake.phone_number(),
+            user_phone=fake.unique.phone_number(),
             created_at=datetime.now(),
             updated_at=datetime.now(),
             user_role_fk=random.choice(roles).user_role_id,
@@ -97,17 +100,22 @@ def create_users(db: Session, centers, roles, num_users: int = 100):
 
 
 def create_bookings(db: Session, users, boxes):
+
     for user in users:
+        start_hour = random.randint(8, 20)
+        duration = random.randint(1, 4)
+        end_hour = (start_hour + duration) % 24
+
         booking = Bookings(
             user_id=user.user_id,
             booking_box_id_fk=random.choice(boxes).box_id,
-            booking_date=fake.date_time_between(start_date="now", end_date="+30d"),
+            booking_date=fake.date_time_between(start_date=start_date, end_date=end_date),
             booking_code="".join(
                 random.choices(string.ascii_uppercase + string.digits, k=4)
             ),
-            booking_start_hour=random.randint(8, 20),
-            booking_duration_hours=random.randint(1, 4),
-            booking_end_hour=random.randint(9, 23),
+            booking_start_hour=start_hour,
+            booking_duration_hours=duration,
+            booking_end_hour=end_hour,
             booking_timestamp=datetime.now(),
         )
         db.add(booking)
@@ -122,7 +130,7 @@ def create_booking_availabilities(db: Session, boxes):
         for hour in range(24):  # 0 to 23 hours
             avail = BookingAvailabilities(
                 box_id_fk=box.box_id,
-                booking_date=fake.date_time_between(start_date="now", end_date="+30d"),
+                booking_date=fake.date_time_between(start_date=start_date, end_date=end_date),
                 hour_of_day=hour,
                 is_available=True,
             )

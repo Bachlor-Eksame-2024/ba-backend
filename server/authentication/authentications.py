@@ -186,7 +186,7 @@ async def verify_email(
 
     return {"message": "Email verified successfully"}
 
-
+  
 #####
 ##### Log out Endpoint #####
 @authentication_router.get("/logout")  # , response_model=Token)

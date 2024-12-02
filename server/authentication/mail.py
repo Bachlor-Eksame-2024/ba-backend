@@ -29,12 +29,15 @@ class EmailSchema(BaseModel):
     email: List[EmailStr]
 
 
+# Get environment variables with defaults
 mail_username = os.getenv("MAIL_USERNAME")
 mail_password = os.getenv("MAIL_PASSWORD")
 mail_from = os.getenv("MAIL_FROM")
-mail_port = os.getenv("MAIL_PORT")
+mail_port = int(os.getenv("MAIL_PORT", "587"))  # Convert to int with default
 mail_server = os.getenv("MAIL_SERVER")
 
+# Print for debugging
+print(f"Mail config: {mail_username}, {mail_server}, {mail_port}")
 
 # Email configuration
 conf = ConnectionConfig(
@@ -48,6 +51,12 @@ conf = ConnectionConfig(
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True,
 )
+# Validate configuration
+if not all([mail_username, mail_password, mail_from, mail_server]):
+    raise ValueError(
+        "Missing required email configuration. Check environment variables: "
+        "MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM, MAIL_SERVER"
+    )
 
 app = FastAPI()
 

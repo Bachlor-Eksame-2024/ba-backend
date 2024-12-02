@@ -7,7 +7,7 @@ from collections import defaultdict
 from math import ceil
 from database import get_db
 from authentication.jwt import get_current_user
-from models import Users, UserRoles, Bookings, FitnessCenters, Boxes
+from models import Users, UserRoles, Bookings, Boxes
 
 admin_router = APIRouter(dependencies=[Depends(get_current_user)])
 
@@ -258,9 +258,7 @@ def get_stats(
 
         # Total Fitness Center boxes (boks)
         total_boks = (
-            db.query(Boxes)
-            .filter(Boxes.fitness_center_fk == fitness_center_id)
-            .count()
+            db.query(Boxes).filter(Boxes.fitness_center_fk == fitness_center_id).count()
         )
 
         # Bookings checked in today
@@ -321,3 +319,86 @@ def get_stats(
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching stats: {str(e)}")
+
+
+##############################
+#### GET BOX AVALIABLILTY ####
+
+
+@admin_router.get("/get-box-availability")
+def get_box_availability(
+    db: Session = Depends(get_db),
+    fitness_center_id: int = Query(..., description="ID of the fitness center"),
+    date: datetime = Query(..., description="Date to check availability"),
+    current_time: str = Query(..., description="Current time in HH:mm format"),
+    duration: int = Query(..., ge=1, le=4, description="Duration in hours (1-4)"),
+):
+    try:
+        # Parse current time and get next available hour
+        current_hour = datetime.strptime(current_time, "%H:%M").hour
+        next_available_hour = current_hour + 1 if current_hour < 23 else None
+
+        # If after 23:00, no more bookings possible today
+        if next_available_hour is None:
+            return {}
+
+        # Get all boxes for the fitness center
+        boxes = (
+            db.query(Boxes).filter(Boxes.fitness_center_fk == fitness_center_id).all()
+        )
+
+        # Get existing bookings for the date
+        bookings = (
+            db.query(Bookings)
+            .join(Users)
+            .filter(
+                Users.fitness_center_fk == fitness_center_id,
+                func.date(Bookings.booking_date) == date.date(),
+                Bookings.booking_start_hour >= next_available_hour,
+            )
+            .all()
+        )
+
+        # Create availability dict
+        availability = {}
+        for box in boxes:
+            availability[box.box_id] = []
+            # Check each possible starting hour
+            for start_hour in range(next_available_hour, 24 - duration + 1):
+                is_available = True
+                # Check if any existing booking overlaps with proposed time slot
+                for booking in bookings:
+                    if booking.booking_box_id_fk == box.box_id:
+                        booking_end = (
+                            booking.booking_start_hour + booking.booking_duration_hours
+                        )
+                        if not (
+                            start_hour + duration <= booking.booking_start_hour
+                            or start_hour >= booking_end
+                        ):
+                            is_available = False
+                            break
+                if is_available:
+                    availability[box.box_id].append(
+                        {"start_hour": start_hour, "end_hour": start_hour + duration}
+                    )
+
+        # Filter out boxes with no available slots
+        available_boxes = {
+            box_id: slots for box_id, slots in availability.items() if slots
+        }
+
+        return {
+            "next_available_hour": next_available_hour,
+            "duration_hours": duration,
+            "box_availability": available_boxes,
+        }
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400, detail=f"Invalid time format. Use HH:mm. Error: {str(e)}"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error checking availability: {str(e)}"
+        )

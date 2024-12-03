@@ -286,6 +286,35 @@ def get_boks_avaliability_by_id(
         )
 
 
+###########################
+#### GET BOOKING BY ID ####
+
+@admin_router.get("/get-booking-by-id")
+def get_booking_by_id(
+    db: Session = Depends(get_db),
+    booking_id: int = Query(..., description="ID of the booking"),
+):
+    booking = db.query(Bookings).filter(Bookings.booking_id == booking_id).first()
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    return {
+        "booking_id": booking.booking_id,
+        "user_id": booking.user_id,
+        "user_first_name": booking.user.user_first_name,
+        "user_last_name": booking.user.user_last_name,
+        "fitness_center_id": booking.user.fitness_center_fk,
+        "fitness_center_name": booking.user.fitness_center.fitness_center_name,
+        "box_id": booking.booking_box_id_fk,
+        "booking_date": booking.booking_date,
+        "booking_code": booking.booking_code,
+        "start_hour": booking.booking_start_hour,
+        "duration_hours": booking.booking_duration_hours,
+        "end_hour": booking.booking_start_hour + booking.booking_duration_hours,
+    }
+
+
+
 ###################
 #### GET STATS ####
 

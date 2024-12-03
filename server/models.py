@@ -66,7 +66,7 @@ class Bookings(Base):
         Integer, ForeignKey("boxes.box_id", ondelete="CASCADE"), nullable=False
     )
     booking_date = Column(DateTime, nullable=False)
-    booking_code = Column(String(4), nullable=False, unique=True)
+    booking_code = Column(String(4), nullable=False)
     booking_start_hour = Column(
         Integer,
         CheckConstraint("booking_start_hour >= 0 AND booking_start_hour <= 23"),

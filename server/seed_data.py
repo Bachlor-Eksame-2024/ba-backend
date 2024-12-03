@@ -75,7 +75,7 @@ def create_fitness_centers(db: Session):
     return created_centers
 
 
-def create_users(db: Session, centers, roles, num_users: int = 1000):
+def create_users(db: Session, centers, roles, num_users: int = 1200):
     users = []
     for _ in range(num_users):
         user = Users(
@@ -99,9 +99,9 @@ def create_users(db: Session, centers, roles, num_users: int = 1000):
     return users
 
 
-def create_bookings(db: Session, users, boxes):
-
-    for user in users:
+def create_bookings(db: Session, users, boxes, total_bookings: int = 9600):
+    for _ in range(total_bookings):
+        user = random.choice(users)
         start_hour = random.randint(8, 20)
         duration = random.randint(1, 4)
         end_hour = (start_hour + duration) % 24
@@ -109,7 +109,9 @@ def create_bookings(db: Session, users, boxes):
         booking = Bookings(
             user_id=user.user_id,
             booking_box_id_fk=random.choice(boxes).box_id,
-            booking_date=fake.date_time_between(start_date=start_date, end_date=end_date),
+            booking_date=fake.date_time_between(
+                start_date=start_date, end_date=end_date
+            ),
             booking_code="".join(
                 random.choices(string.ascii_uppercase + string.digits, k=4)
             ),
@@ -123,6 +125,8 @@ def create_bookings(db: Session, users, boxes):
 
         # Update user's booking FK
         user.user_bookings_fk = booking.booking_id
+
+    db.commit()
 
 
 def create_booking_availabilities(db: Session, boxes):

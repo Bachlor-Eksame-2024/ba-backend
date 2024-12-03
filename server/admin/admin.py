@@ -189,6 +189,7 @@ def delete_user(
 #######################
 #### GET ALL BOKS ####
 
+
 @admin_router.get("/get-boks")
 def get_all_boks(
     db: Session = Depends(get_db),
@@ -211,8 +212,10 @@ def get_all_boks(
 
     return {"boks": boks}
 
+
 #######################
 #### GET ALL BOKS ####
+
 
 @admin_router.get("/get-boks-avaliability-by-id")
 def get_boks_avaliability_by_id(

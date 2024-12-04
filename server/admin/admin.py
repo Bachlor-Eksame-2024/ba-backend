@@ -289,6 +289,7 @@ def get_boks_avaliability_by_id(
 ###########################
 #### GET BOOKING BY ID ####
 
+
 @admin_router.get("/get-booking-by-id")
 def get_booking_by_id(
     db: Session = Depends(get_db),
@@ -312,7 +313,6 @@ def get_booking_by_id(
         "duration_hours": booking.booking_duration_hours,
         "end_hour": booking.booking_start_hour + booking.booking_duration_hours,
     }
-
 
 
 ###################
@@ -409,7 +409,7 @@ def get_stats(
 
         # Convert to array of objects
         daily_stats = [
-            {"date": date, "count": count} for date, count in booking_dict.items()
+            {"name": date, "pv": count} for date, count in booking_dict.items()
         ]
 
         return {

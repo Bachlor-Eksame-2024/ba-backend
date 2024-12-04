@@ -23,6 +23,7 @@ seed_router = APIRouter()
 start_date = datetime.now() - timedelta(days=30)
 end_date = datetime.now() + timedelta(days=10)
 
+
 def create_user_roles(db: Session):
     roles = ["admin", "user"]
     for role in roles:
@@ -134,7 +135,9 @@ def create_booking_availabilities(db: Session, boxes):
         for hour in range(24):  # 0 to 23 hours
             avail = BookingAvailabilities(
                 box_id_fk=box.box_id,
-                booking_date=fake.date_time_between(start_date=start_date, end_date=end_date),
+                booking_date=fake.date_time_between(
+                    start_date=start_date, end_date=end_date
+                ),
                 hour_of_day=hour,
                 is_available=True,
             )

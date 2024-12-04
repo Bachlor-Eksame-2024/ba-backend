@@ -79,7 +79,6 @@ def create_verification_email_content(token: str, email: str):
         <p>Hvis du ikke har oprettet en konto, skal du ignorere denne e-mail.</p>
     </body>
     </html>
-    
     """
 
 

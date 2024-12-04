@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+
 # from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base, get_api_key
 from authentication.authentications import authentication_router
@@ -55,6 +56,7 @@ if os.getenv("ENABLE_ADMIN", "true") == "true":
 
 # Add the seed router to the app
 app.include_router(seed_router, prefix="/api/seed", tags=["Database Seeding"])
+
 
 @app.get("/")
 def read_root():

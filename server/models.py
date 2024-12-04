@@ -45,8 +45,9 @@ class Boxes(Base):
     box_number = Column(Integer, nullable=False, autoincrement=True, unique=True)
     box_availability = Column(String(255), nullable=False)
     created_at = Column(DateTime, nullable=False)
-    fitness_center_fk = Column(Integer, ForeignKey("fitness_centers.fitness_center_id"), 
-                               nullable=False)
+    fitness_center_fk = Column(
+        Integer, ForeignKey("fitness_centers.fitness_center_id"), nullable=False
+    )
     # Add this relationship
     booking_availabilities = relationship("BookingAvailabilities", back_populates="box")
     bookings = relationship("Bookings", back_populates="boxes")

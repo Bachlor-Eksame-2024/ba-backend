@@ -7,6 +7,7 @@ from authentication.authentications import authentication_router
 from workouts.workout import workout_router
 from admin.admin import admin_router
 from stripe_payments.payments import payments_router
+from profile_updates.Profile import profile_router
 from seed_data import seed_router
 
 # import models
@@ -53,6 +54,9 @@ if os.getenv("ENABLE_WORKOUT", "true") == "true":
 
 if os.getenv("ENABLE_ADMIN", "true") == "true":
     app.include_router(admin_router, prefix="/api/admin", tags=["Admin Requests"])
+
+if os.getenv("ENABLE_PROFILE", "true") == "true":
+    app.include_router(profile_router, prefix="/api/profile", tags=["Profile Changes"])
 
 # Add the seed router to the app
 app.include_router(seed_router, prefix="/api/seed", tags=["Database Seeding"])

@@ -66,13 +66,33 @@ async def update_profile(
 
     # Update the user profile
     if not validate_first_name(user.first_name):
-        raise HTTPException(status_code=400, detail="Invalid first name")
+        raise HTTPException(status_code=400, detail="Ugyldigt fornavn")
     if not validate_last_name(user.last_name): 
-        raise HTTPException(status_code=400, detail="Invalid last name")
+        raise HTTPException(status_code=400, detail="Ugyldigt efternavn")
     if not valide_email(user.email):
-        raise HTTPException(status_code=400, detail="Invalid email")
+        raise HTTPException(status_code=400, detail="Ugyldigt Email")
     if not validate_phone_number(user.phone):
-        raise HTTPException(status_code=400, detail="Invalid phone number")
+        raise HTTPException(status_code=400, detail="Ugyldigt Telefonnummer")
+
+   # Check email only if it changed
+    if user.email.lower() != get_user_in_db.user_email.lower():
+        user_email_exists = (
+            db.query(Users)
+            .filter(func.lower(Users.user_email) == user.email.lower())
+            .first()
+        )
+        if user_email_exists:
+            raise HTTPException(status_code=400, detail="Bruger-e-mail eksisterer allerede")
+
+    # Check phone only if it changed
+    if user.phone != get_user_in_db.user_phone:
+        user_phone_exists = (
+            db.query(Users)
+            .filter(Users.user_phone == user.phone)
+            .first()
+        )
+        if user_phone_exists:
+            raise HTTPException(status_code=400, detail="Telefonnummer eksisterer allerede")
 
     # Get current timestamp
     current_time = datetime.now(timezone.utc)

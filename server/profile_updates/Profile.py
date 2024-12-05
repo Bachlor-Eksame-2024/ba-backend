@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, Query, Body, HTTPException, status
-from pydantic import BaseModel
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from passlib.context import CryptContext
 from authentication.jwt import get_current_user
-from datetime import timedelta, datetime, timezone
+from datetime import datetime, timezone
 from database import get_db
 from models import Users
 from profile_updates.types.profile_types import ChangePassword, UpdateProfile

@@ -7,7 +7,7 @@ from authentication.authentications import authentication_router
 from workouts.workout import workout_router
 from admin.admin import admin_router
 from stripe_payments.payments import payments_router
-from profile_updates.profile import profile_router
+from profiles.profile import profile_router
 from seed_data import seed_router
 
 # import models

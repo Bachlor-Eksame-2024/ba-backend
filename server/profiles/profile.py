@@ -7,7 +7,7 @@ from authentication.jwt import get_current_user, create_access_token
 from datetime import datetime, timezone, timedelta
 from database import get_db
 from models import Users
-from profile_updates.types.profile_types import ChangePassword, UpdateProfile
+from profiles.types.profile_types import ChangePassword, UpdateProfile
 from authentication.validate import (
     validate_password,
     valide_email,

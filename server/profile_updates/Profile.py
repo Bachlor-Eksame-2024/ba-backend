@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from fastapi.responses import JSONResponse
 from sqlalchemy import func
 from passlib.context import CryptContext
-from authentication.jwt import get_current_user
-from datetime import datetime, timezone
+from authentication.jwt import get_current_user, create_access_token
+from datetime import datetime, timezone, timedelta
 from database import get_db
 from models import Users
 from profile_updates.types.profile_types import ChangePassword, UpdateProfile
@@ -17,7 +18,7 @@ from authentication.validate import (
 
 profile_router = APIRouter(dependencies=[Depends(get_current_user)])
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+ACCESS_TOKEN_EXPIRE_MINUTES = 180
 #########################
 #### Change password ####
 
@@ -125,5 +126,22 @@ async def update_profile(
         "user_role_name": get_user_in_db.user_role.role_name,
         "user_id": get_user_in_db.user_id,
     }
+
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": updated_user}, expires_delta=access_token_expires
+    )
+
+    response = JSONResponse(
+        {"user": updated_user, "message": "Profile updated successfully"},
+        status_code=201,
+    )
+    response.set_cookie(
+        key="fitboks-auth-Token",
+        value=access_token,
+        httponly=True,
+        samesite="Strict",
+        secure=True,
+    )
 
     return {"message": "Profile updated successfully", "user": updated_user}

@@ -7,6 +7,7 @@ class ChangePassword(BaseModel):
     new_password: str
     confirm_password: str
 
+
 class UpdateProfile(BaseModel):
     user_id: str
     first_name: str
@@ -14,5 +15,3 @@ class UpdateProfile(BaseModel):
     email: str
     phone: str
     fitness_center_id: str
-
-

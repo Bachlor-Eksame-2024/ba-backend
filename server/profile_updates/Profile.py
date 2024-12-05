@@ -39,7 +39,10 @@ async def change_password(
         raise HTTPException(status_code=400, detail="Passwords do not match")
 
     if not validate_password(user.new_password):
-        raise HTTPException(status_code=400, detail="Invalid password most contain at least 8 characters and 1 number and 1 special character")
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid password most contain at least 8 characters and 1 number and 1 special character",
+        )
     print(get_current_user, flush=True)
 
     hash_password = pwd_context.hash(user.new_password)
@@ -67,14 +70,14 @@ async def update_profile(
     # Update the user profile
     if not validate_first_name(user.first_name):
         raise HTTPException(status_code=400, detail="Ugyldigt fornavn")
-    if not validate_last_name(user.last_name): 
+    if not validate_last_name(user.last_name):
         raise HTTPException(status_code=400, detail="Ugyldigt efternavn")
     if not valide_email(user.email):
         raise HTTPException(status_code=400, detail="Ugyldigt Email")
     if not validate_phone_number(user.phone):
         raise HTTPException(status_code=400, detail="Ugyldigt Telefonnummer")
 
-   # Check email only if it changed
+    # Check email only if it changed
     if user.email.lower() != get_user_in_db.user_email.lower():
         user_email_exists = (
             db.query(Users)
@@ -82,17 +85,19 @@ async def update_profile(
             .first()
         )
         if user_email_exists:
-            raise HTTPException(status_code=400, detail="Bruger-e-mail eksisterer allerede")
+            raise HTTPException(
+                status_code=400, detail="Bruger-e-mail eksisterer allerede"
+            )
 
     # Check phone only if it changed
     if user.phone != get_user_in_db.user_phone:
         user_phone_exists = (
-            db.query(Users)
-            .filter(Users.user_phone == user.phone)
-            .first()
+            db.query(Users).filter(Users.user_phone == user.phone).first()
         )
         if user_phone_exists:
-            raise HTTPException(status_code=400, detail="Telefonnummer eksisterer allerede")
+            raise HTTPException(
+                status_code=400, detail="Telefonnummer eksisterer allerede"
+            )
 
     # Get current timestamp
     current_time = datetime.now(timezone.utc)

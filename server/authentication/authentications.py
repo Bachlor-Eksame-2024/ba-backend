@@ -46,6 +46,7 @@ async def login(user: LoginUser, db: Session = Depends(get_db)):
         "user_phone": get_user_in_db.user_phone,
         "fitness_center": get_user_in_db.fitness_center.fitness_center_name,
         "fitness_center_id": get_user_in_db.fitness_center.fitness_center_id,
+        "is_member": get_user_in_db.is_member,
         "is_verified": get_user_in_db.is_verified,
         "user_role": get_user_in_db.user_role_fk,
         "user_role_name": get_user_in_db.user_role.role_name,
@@ -142,6 +143,7 @@ async def signup(user: SignupUser, db: Session = Depends(get_db)):
             "user_phone": new_user.user_phone,
             "fitness_center": new_user.fitness_center.fitness_center_name,
             "fitness_center_id": new_user.fitness_center.fitness_center_id,
+            'is_member': new_user.is_member,
             "is_verified": new_user.is_verified,
             "user_role": new_user.user_role_fk,
             "user_role_name": new_user.user_role.role_name,
@@ -245,4 +247,3 @@ async def verify_Login(current_user: dict = Depends(get_current_user)):
             status_code=200,
         )
     return response
-

@@ -245,4 +245,3 @@ async def verify_Login(current_user: dict = Depends(get_current_user)):
             status_code=200,
         )
     return response
-

@@ -9,6 +9,7 @@ from admin.admin import admin_router
 from stripe_payments.payments import payments_router
 from profiles.profile import profile_router
 from seed_data import seed_router
+from bookings.bookings import booking_router
 
 # import models
 import os
@@ -18,6 +19,7 @@ import os
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(debug=True, dependencies=[Depends(get_api_key)])
+
 origins = [
     "http://localhost:5173",
     "http://localhost",
@@ -46,6 +48,10 @@ if os.getenv("ENABLE_USER_AUTH", "true") == "true":
     app.include_router(
         authentication_router, prefix="/api/auth", tags=["User Authentication"]
     )
+
+if os.getenv("ENABLE_BOOKING", "true") == "true":
+    app.include_router(booking_router, prefix="/api/booking", tags=["Booking Request"])
+
 if os.getenv("ENABLE_PAYMENTS", "true") == "true":
     app.include_router(payments_router, prefix="/api/payment", tags=["Stripe Payments"])
 

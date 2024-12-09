@@ -42,7 +42,8 @@ async def change_password(
     if not validate_password(user.new_password):
         raise HTTPException(
             status_code=400,
-            detail="Invalid password most contain at least 8 characters and 1 number and 1 special character",
+            detail="""Invalid password most contain at least 8 characters and 
+            1 number and 1 special character""",
         )
     print(get_current_user, flush=True)
 
@@ -189,7 +190,6 @@ def get_user_stats(
 
     weekly_stats = [
         {
-
             "pv": value,
             "name": f"Uge {datetime.strptime(key, '%Y-%U').strftime('%U')}",
         }

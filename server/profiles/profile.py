@@ -3,11 +3,12 @@ from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from sqlalchemy import func
 from passlib.context import CryptContext
+from database import get_db
 from authentication.jwt import get_current_user, create_access_token
 from datetime import datetime, timezone, timedelta
-from database import get_db
-from models import Users
-from profiles.types.profile_types import ChangePassword, UpdateProfile
+from collections import defaultdict
+from models import Users, Bookings
+from profiles.types.profile_types import ChangePassword, UpdateProfile, UserStats
 from authentication.validate import (
     validate_password,
     valide_email,
@@ -41,7 +42,8 @@ async def change_password(
     if not validate_password(user.new_password):
         raise HTTPException(
             status_code=400,
-            detail="Invalid password most contain at least 8 characters and 1 number and 1 special character",
+            detail="""Invalid password most contain at least 8 characters and
+            1 number and 1 special character""",
         )
     print(get_current_user, flush=True)
 
@@ -121,6 +123,7 @@ async def update_profile(
         "user_phone": get_user_in_db.user_phone,
         "fitness_center": get_user_in_db.fitness_center.fitness_center_name,
         "fitness_center_id": get_user_in_db.fitness_center.fitness_center_id,
+        "is_member": get_user_in_db.is_member,
         "is_verified": get_user_in_db.is_verified,
         "user_role": get_user_in_db.user_role_fk,
         "user_role_name": get_user_in_db.user_role.role_name,
@@ -145,3 +148,56 @@ async def update_profile(
     )
 
     return {"message": "Profile updated successfully", "user": updated_user}
+
+
+@profile_router.post("/get-user-stats")
+def get_user_stats(
+    user: UserStats,
+    db: Session = Depends(get_db),
+):
+    one_year_ago = datetime.now() - timedelta(days=365)
+    # Get all user bookings from the the last year
+    get_user_bookings = (
+        db.query(Bookings)
+        .filter(
+            Bookings.user_id == user.user_id,
+            func.date(Bookings.booking_date) >= one_year_ago,
+        )
+        .order_by(Bookings.booking_date.desc())
+        .all()
+    )
+    if not get_user_bookings:
+        raise HTTPException(status_code=404, detail="No bookings found")
+
+    monthly_bookings = defaultdict(int)
+    weekly_bookings = defaultdict(int)
+
+    # Count bookings by month and week
+    for booking in get_user_bookings:
+        month_key = booking.booking_date.strftime("%Y-%m")  # YYYY-MM format
+        week_key = booking.booking_date.strftime("%Y-%U")  # YYYY-WW format
+
+        monthly_bookings[month_key] += 1
+        weekly_bookings[week_key] += 1
+    # Convert to sorted lists
+    monthly_stats = [
+        {
+            "pv": value,
+            "name": datetime.strptime(key, "%Y-%m").strftime("%B %Y"),
+        }
+        for key, value in sorted(monthly_bookings.items(), reverse=True)
+    ]
+
+    weekly_stats = [
+        {
+            "pv": value,
+            "name": f"Uge {datetime.strptime(key, '%Y-%U').strftime('%U')}",
+        }
+        for key, value in sorted(weekly_bookings.items(), reverse=True)
+    ]
+
+    return {
+        "total_bookings": len(get_user_bookings),
+        "monthly_stats": monthly_stats,
+        "weekly_stats": weekly_stats,
+    }

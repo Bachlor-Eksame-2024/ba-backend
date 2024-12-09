@@ -15,3 +15,7 @@ class UpdateProfile(BaseModel):
     email: str
     phone: str
     fitness_center_id: str
+
+
+class UserStats(BaseModel):
+    user_id: str

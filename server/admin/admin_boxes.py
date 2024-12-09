@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from database import get_db
 from models import Boxes, Bookings
 from datetime import datetime, timedelta
-from sqlalchemy import func
 from admin.types.admin_types import BoksUpdate
 import random
 import string

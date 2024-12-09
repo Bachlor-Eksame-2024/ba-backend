@@ -12,3 +12,14 @@ class BookingData(BaseModel):
 
 class GetBooking(BaseModel):
     user_id: int
+
+
+class DeleteBooking(BaseModel):
+    booking_id: int
+
+
+class GetBookingTime(BaseModel):
+    fitness_center_id: int
+    booking_date: str
+    current_time: str
+    duration_hours: int

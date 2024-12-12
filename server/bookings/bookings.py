@@ -159,6 +159,7 @@ def create_booking(
     # Add the new booking to the database
     db.add(new_booking)
     db.commit()
+    db.refresh(new_booking)
 
     return {"status": "success", "message": new_booking}
 

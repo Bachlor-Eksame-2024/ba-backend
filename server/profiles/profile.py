@@ -155,49 +155,65 @@ def get_user_stats(
     user: UserStats,
     db: Session = Depends(get_db),
 ):
-    one_year_ago = datetime.now() - timedelta(days=365)
-    # Get all user bookings from the the last year
+    today = datetime.now()
+    start_month = (today.replace(day=1) - timedelta(days=330)).replace(day=1)
+    four_weeks_ago = today - timedelta(weeks=4)
+
+    monthly_bookings = {}
+    weekly_bookings = {}
+
+    # Generate months
+    current = start_month
+    while current <= today:
+        month_key = current.strftime("%Y-%m")
+        monthly_bookings[month_key] = 0
+        current = (current.replace(day=1) + timedelta(days=32)).replace(day=1)
+
+    # Generate exactly 4 weeks
+    for week_num in range(4):
+        week_date = today - timedelta(weeks=week_num)
+        week_key = week_date.strftime("%Y-%U")
+        weekly_bookings[week_key] = 0
+
+    # Get bookings
     get_user_bookings = (
         db.query(Bookings)
         .filter(
             Bookings.user_id == user.user_id,
-            func.date(Bookings.booking_date) >= one_year_ago,
+            func.date(Bookings.booking_date) >= start_month,
         )
         .order_by(Bookings.booking_date.desc())
         .all()
     )
-    if not get_user_bookings:
-        raise HTTPException(status_code=404, detail="No bookings found")
 
-    monthly_bookings = defaultdict(int)
-    weekly_bookings = defaultdict(int)
-
-    # Count bookings by month and week
+    # Update counts
     for booking in get_user_bookings:
-        month_key = booking.booking_date.strftime("%Y-%m")  # YYYY-MM format
-        week_key = booking.booking_date.strftime("%Y-%U")  # YYYY-WW format
+        month_key = booking.booking_date.strftime("%Y-%m")
+        week_key = booking.booking_date.strftime("%Y-%U")
+        if month_key in monthly_bookings:
+            monthly_bookings[month_key] += 1
+        if week_key in weekly_bookings:
+            weekly_bookings[week_key] += 1
 
-        monthly_bookings[month_key] += 1
-        weekly_bookings[week_key] += 1
-    # Convert to sorted lists
+    # Format monthly stats with 3-letter abbreviations
     monthly_stats = [
         {
             "pv": value,
-            "name": datetime.strptime(key, "%Y-%m").strftime("%B %Y"),
+            "name": datetime.strptime(key, "%Y-%m").strftime("%b"),
         }
         for key, value in sorted(monthly_bookings.items(), reverse=True)
     ]
 
+    # Format weekly stats with simple week numbers 1-4
     weekly_stats = [
-        {
-            "pv": value,
-            "name": f"Uge {datetime.strptime(key, '%Y-%U').strftime('%U')}",
-        }
-        for key, value in sorted(weekly_bookings.items(), reverse=True)
+        {"pv": value, "name": f"Uge {4 - idx}"}
+        for idx, (key, value) in enumerate(
+            sorted(weekly_bookings.items(), reverse=True)
+        )
     ]
 
     return {
-        "total_bookings": len(get_user_bookings),
-        "monthly_stats": monthly_stats,
-        "weekly_stats": weekly_stats,
+        "total_bookings": len(get_user_bookings) if get_user_bookings else 0,
+        "monthly_stats": monthly_stats[::-1],
+        "weekly_stats": weekly_stats[::-1],
     }

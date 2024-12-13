@@ -237,7 +237,7 @@ def get_boks_avaliability_by_id(
 #### GET BOOKING BY ID ####
 
 
-@boxes_router.put("/update-boks-status")
+@boxes_router.put("/box-status")
 def update_boks_status(boks_update: BoksUpdate, db: Session = Depends(get_db)):
     try:
         # Get current time info

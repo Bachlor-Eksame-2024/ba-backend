@@ -70,8 +70,6 @@ class Booking(BaseModel):
     end_hour: int
 
 
-
-
 class Booking(BaseModel):
     start_hour: int
     duration: int

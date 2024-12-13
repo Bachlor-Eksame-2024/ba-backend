@@ -21,7 +21,6 @@ class UserStats(BaseModel):
     user_id: str
 
 
-
 class MonthlyStat(BaseModel):
     pv: int
     name: str

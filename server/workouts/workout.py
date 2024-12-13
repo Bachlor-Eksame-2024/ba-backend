@@ -78,7 +78,7 @@ async def initialize_workouts(
         )
 
 
-@workout_router.get("/workouts")
+@workout_router.get("")
 async def get_workouts(db: Session = Depends(get_db)):
     workouts = db.query(Workout).all()
 
@@ -123,7 +123,7 @@ async def get_workouts(db: Session = Depends(get_db)):
     return JSONResponse({"workouts": workout_list}, status_code=200)
 
 
-@workout_router.post("/workout")
+@workout_router.post("")
 async def create_workout(
     workout_data: List[CreateWorkout],
     current_user: dict = Depends(get_current_user),
@@ -139,7 +139,7 @@ async def create_workout(
     )
 
 
-@workout_router.delete("/workout/{workout_id}")
+@workout_router.delete("/{workout_id}")
 async def delete_workout(
     workout_id: int,
     # current_user: dict = Depends(get_current_user),

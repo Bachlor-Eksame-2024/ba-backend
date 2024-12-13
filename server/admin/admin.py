@@ -80,7 +80,10 @@ def get_all_users(
 #### SEARCH USERS ####
 
 
-@admin_router.get("/search-users/{fitness_center_id}/{page}/{page_size}/{search_query}", response_model=UsersResponse)
+@admin_router.get(
+    "/search-users/{fitness_center_id}/{page}/{page_size}/{search_query}",
+    response_model=UsersResponse,
+)
 def search_users(
     db: Session = Depends(get_db),
     fitness_center_id: int = Path(..., description="ID of the fitness center"),
@@ -150,7 +153,7 @@ class MembershipUpdate(BaseModel):
     is_member: bool
 
 
-@admin_router.put("/update-membership")
+@admin_router.put("/membership")
 def update_membership(
     data: MembershipUpdate = Body(...), db: Session = Depends(get_db)
 ):

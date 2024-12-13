@@ -1,10 +1,11 @@
-from fastapi import APIRouter, Depends, Query, Body, HTTPException, status
+from fastapi import APIRouter, Depends, Path, Body, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from math import ceil
 from database import get_db
 from authentication.jwt import get_current_user
 from models import Users, UserRoles
+from admin.types.admin_types import UsersResponse
 from .admin_boxes import boxes_router
 from .admin_stats import stats_router
 
@@ -17,12 +18,15 @@ admin_router.include_router(stats_router)
 #### GET ALL USERS ####
 
 
-@admin_router.get("/get-users")
+@admin_router.get(
+    "/users/{fitness_center_id}/{page}/{page_size}",
+    response_model=UsersResponse,
+)
 def get_all_users(
     db: Session = Depends(get_db),
-    fitness_center_id: int = Query(..., description="ID of the fitness center"),
-    page: int = Query(default=1, gt=0),
-    page_size: int = Query(default=10, gt=0),
+    fitness_center_id: int = Path(..., description="ID of the fitness center"),
+    page: int = Path(..., description="Page number", gt=0),
+    page_size: int = Path(..., description="Number of items per page", gt=0),
 ):
     skip = (page - 1) * page_size
 
@@ -76,13 +80,13 @@ def get_all_users(
 #### SEARCH USERS ####
 
 
-@admin_router.get("/search-users")
+@admin_router.get("/search-users/{fitness_center_id}/{page}/{page_size}/{search_query}", response_model=UsersResponse)
 def search_users(
     db: Session = Depends(get_db),
-    fitness_center_id: int = Query(..., description="ID of the fitness center"),
-    search_query: str = Query(..., min_length=1, description="Search query for users"),
-    page: int = Query(default=1, gt=0),
-    page_size: int = Query(default=10, gt=0),
+    fitness_center_id: int = Path(..., description="ID of the fitness center"),
+    search_query: str = Path(..., min_length=1, description="Search query for users"),
+    page: int = Path(..., description="Page number", gt=0),
+    page_size: int = Path(..., description="Number of items per page", gt=0),
 ):
     skip = (page - 1) * page_size
     search_term = f"%{search_query.strip()}%"

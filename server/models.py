@@ -17,7 +17,6 @@ from datetime import datetime, timezone
 ## Base is a declarative_base instance from SQLAlchemy
 ## it is used to create the database tables
 
-
 class BookingAvailabilities(Base):
     __tablename__ = "booking_availabilities"  # Fixed typo in table name
 

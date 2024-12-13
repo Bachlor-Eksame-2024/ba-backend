@@ -220,6 +220,7 @@ def get_boks_avaliability_by_id(
                         dates_dict[booking_date][str(hour)] = {
                             "available": False,
                             "booking": {
+                                "booking_id": booking.booking_id,
                                 "start_hour": booking.booking_start_hour,
                                 "duration": booking.booking_duration_hours,
                                 "end_hour": booking.booking_start_hour

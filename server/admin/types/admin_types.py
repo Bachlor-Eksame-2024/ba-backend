@@ -65,6 +65,7 @@ class BoxResponse(BaseModel):
 
 
 class Booking(BaseModel):
+    booking_id: int
     start_hour: int
     duration: int
     end_hour: int

@@ -165,9 +165,9 @@ def update_membership(
 
 ######################
 #### DELETE USER ####
-@admin_router.delete("/delete-user/{user_id}")
+@admin_router.delete("/user/{user_id}")
 def delete_user(
-    user_id: int,
+    user_id: int = Path(..., description="ID of the user to delete"),
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):

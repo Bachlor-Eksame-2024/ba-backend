@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
 from sqlalchemy import func
@@ -6,9 +6,13 @@ from passlib.context import CryptContext
 from database import get_db
 from authentication.jwt import get_current_user, create_access_token
 from datetime import datetime, timezone, timedelta
-from collections import defaultdict
 from models import Users, Bookings
-from profiles.types.profile_types import ChangePassword, UpdateProfile, UserStats
+from profiles.types.profile_types import (
+    ChangePassword,
+    UpdateProfile,
+    UserStats,
+    UserStatsResponse,
+)
 from authentication.validate import (
     validate_password,
     valide_email,
@@ -24,7 +28,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 180
 #### Change password ####
 
 
-@profile_router.put("/change-password")
+@profile_router.put("/change-password/")
 async def change_password(
     user: ChangePassword,
     db: Session = Depends(get_db),
@@ -150,9 +154,10 @@ async def update_profile(
     return {"message": "Profile updated successfully", "user": updated_user}
 
 
-@profile_router.post("/get-user-stats")
+# user-stats/{id}, response_model=userStatsResponse
+@profile_router.get("/user-stats/{user}", response_model=UserStatsResponse)
 def get_user_stats(
-    user: UserStats,
+    user: str = Path(..., description="The ID of the user"),
     db: Session = Depends(get_db),
 ):
     today = datetime.now()
@@ -179,7 +184,7 @@ def get_user_stats(
     get_user_bookings = (
         db.query(Bookings)
         .filter(
-            Bookings.user_id == user.user_id,
+            Bookings.user_id == user,
             func.date(Bookings.booking_date) >= start_month,
         )
         .order_by(Bookings.booking_date.desc())

@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Path, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
+from admin.types.admin_types import StatsResponse
 from collections import defaultdict
 from models import Boxes, Bookings, Users
 from datetime import datetime, timedelta
@@ -12,10 +13,10 @@ stats_router = APIRouter()
 #### GET STATS ####
 
 
-@stats_router.get("/get-stats")
+@stats_router.get("/stats/{fitness_center_id}", response_model=StatsResponse)
 def get_stats(
     db: Session = Depends(get_db),
-    fitness_center_id: int = Query(..., description="ID of the fitness center"),
+    fitness_center_id: int = Path(..., description="ID of the fitness center"),
 ):
     # Get current date info
     today = datetime.now().date()

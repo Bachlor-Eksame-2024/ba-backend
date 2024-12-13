@@ -1,4 +1,4 @@
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel
 from typing import List, Dict
 
 
@@ -9,7 +9,6 @@ class BookingData(BaseModel):
     booking_date: str
     booking_start_hour: int
     booking_end_hour: int
-
 
 
 class GetBookingTime(BaseModel):
@@ -45,6 +44,7 @@ class TimeSlotResponse(BaseModel):
     next_available_hour: int
     duration_hours: int
     box_availability: Dict[str, List[Dict[str, int]]]
+
 
 class DeleteBookingResponse(BaseModel):
     status: str

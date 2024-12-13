@@ -35,7 +35,7 @@ booking_router = APIRouter(dependencies=[Depends(get_current_user)])
 # /booking/get-bookings?user_id=1000 --> /booking/get-bookings/1000
 
 
-@booking_router.get("/bookings/{user_id}", response_model=BookingResponse)
+@booking_router.get("/{user_id}", response_model=BookingResponse)
 def get_booking(
     # ..., Required parameter with no default
     user_id: int = Path(..., description="ID of the user"),
@@ -80,7 +80,7 @@ def does_time_overlap(start1: int, end1: int, start2: int, end2: int) -> bool:
 
 # /get-available-time-slots/2/131224/1302/2
 @booking_router.get(
-    "/time-slots/{fitness_center_id}/{booking_date}/{current_time}/{duration_hours}",
+    "/{fitness_center_id}/{booking_date}/{current_time}/{duration_hours}",
     response_model=TimeSlotResponse,
 )
 def get_available_time_slots(
@@ -169,7 +169,7 @@ def get_available_time_slots(
 #### CREATE NEW BOOKING ####
 
 
-@booking_router.post("/bookings")
+@booking_router.post("")
 def create_booking(
     booking_data: BookingData,
     db=Depends(get_db),
@@ -208,7 +208,7 @@ def create_booking(
 #### DELETE BOOKING ####
 
 
-@booking_router.delete("/bookings/{booking_id}", response_model=DeleteBookingResponse)
+@booking_router.delete("/{booking_id}", response_model=DeleteBookingResponse)
 def delete_booking(
     booking_id: int = Path(..., description="The ID of the booking"), db=Depends(get_db)
 ):

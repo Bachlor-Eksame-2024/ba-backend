@@ -41,7 +41,7 @@ def create_boxes(
         box = Boxes(
             box_number=i + 1,
             created_at=datetime.now(),
-            box_availability="available",
+            box_availability="Ledigt",
             fitness_center_fk=fitness_centers[
                 i % len(fitness_centers)
             ].fitness_center_id,

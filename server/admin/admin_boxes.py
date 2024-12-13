@@ -1,10 +1,15 @@
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Path, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from database import get_db
 from models import Boxes, Bookings
 from datetime import datetime, timedelta
-from admin.types.admin_types import BoksUpdate
+from admin.types.admin_types import (
+    BoksUpdate,
+    BoxAvailabilityResponse,
+    BoxResponse,
+    BoxAvailabilityByIdResponse,
+)
 import random
 import string
 
@@ -21,14 +26,18 @@ def does_time_overlap(start1: int, end1: int, start2: int, end2: int) -> bool:
     return not (end1 <= start2 or start1 >= end2)
 
 
-@boxes_router.get("/get-box-availability")
+@boxes_router.get(
+    "/box-availability/{fitness_center_id}/{date}/{current_time}/{duration}",
+    response_model=BoxAvailabilityResponse,
+)
 def get_box_availability(
     db: Session = Depends(get_db),
-    fitness_center_id: int = Query(..., description="ID of the fitness center"),
-    date: datetime = Query(..., description="Date to check availability"),
-    current_time: str = Query(..., description="Current time in HH:mm format"),
-    duration: int = Query(..., ge=1, le=4, description="Duration in hours (1-4)"),
+    fitness_center_id: int = Path(..., description="ID of the fitness center"),
+    date: datetime = Path(..., description="Date to check availability"),
+    current_time: str = Path(..., description="Current time in HHMM format"),
+    duration: int = Path(..., ge=1, le=4, description="Duration in hours (1-4)"),
 ):
+    current_time = f"{current_time[:2]}:{current_time[2:]}"
     try:
         # Parse current time and get next available hour
         current_hour = datetime.strptime(current_time, "%H:%M").hour
@@ -80,7 +89,12 @@ def get_box_availability(
 
         # Remove boxes with no available slots
         available_boxes = {
-            box_id: slots for box_id, slots in availability.items() if slots
+            str(box_id): [
+                {"start_hour": slot["start_hour"], "end_hour": slot["end_hour"]}
+                for slot in slots
+            ]
+            for box_id, slots in availability.items()
+            if slots
         }
 
         return {
@@ -99,10 +113,10 @@ def get_box_availability(
 #### GET ALL BOKS ####
 
 
-@boxes_router.get("/get-boks")
+@boxes_router.get("/box/{fitness_center_id}", response_model=BoxResponse)
 def get_all_boks(
+    fitness_center_id: int = Path(..., description="ID of the fitness center"),
     db: Session = Depends(get_db),
-    fitness_center_id: int = Query(..., description="ID of the fitness center"),
 ):
     # Get current time and calculate next hour
     current_time = datetime.now()
@@ -133,18 +147,16 @@ def get_all_boks(
     booked_box_ids = {box_id for (box_id,) in booked_box_ids}
 
     # Update box availability based on bookings
-    response_boxes = []
-    for box in boxes:
-        box_dict = {
+    response_boxes = [
+        {
             "box_id": box.box_id,
-            "created_at": box.created_at,
+            "created_at": box.created_at.strftime("%Y-%m-%d %H:%M:%S"),
             "box_number": box.box_number,
-            "box_availability": (
-                "Booket" if box.box_id in booked_box_ids else "Ledigt"
-            ),
+            "box_availability": box.box_availability,
             "fitness_center_fk": box.fitness_center_fk,
         }
-        response_boxes.append(box_dict)
+        for box in boxes
+    ]
 
     return {"boks": response_boxes}
 
@@ -153,18 +165,20 @@ def get_all_boks(
 #### GET ALL BOKS ####
 
 
-@boxes_router.get("/get-boks-avaliability-by-id")
+@boxes_router.get(
+    "/available-box/{fitness_center_id}/{boks_id}",
+    response_model=BoxAvailabilityByIdResponse,
+)
 def get_boks_avaliability_by_id(
     db: Session = Depends(get_db),
-    fitness_center_id: int = Query(..., description="ID of the fitness center"),
-    boks_id: int = Query(..., description="ID of the boks"),
+    fitness_center_id: int = Path(..., description="ID of the fitness center"),
+    boks_id: int = Path(..., description="ID of the box"),
 ):
     try:
-        # Get current date and date range
         today = datetime.now().date()
         date_range = [today + timedelta(days=x) for x in range(7)]
 
-        # Get box
+        # Get box and bookings
         box = (
             db.query(Boxes)
             .filter(
@@ -176,7 +190,6 @@ def get_boks_avaliability_by_id(
         if not box:
             raise HTTPException(status_code=404, detail="Box not found")
 
-        # Get all bookings for this box in next 7 days
         bookings = (
             db.query(Bookings)
             .filter(
@@ -188,25 +201,25 @@ def get_boks_avaliability_by_id(
         )
 
         # Create availability map
-        availability = {}
+        dates_dict = {}
         for date in date_range:
-            availability[date.strftime("%Y-%m-%d")] = {
-                hour: {"available": True, "booking": None} for hour in range(24)
+            date_str = date.strftime("%Y-%m-%d")
+            dates_dict[date_str] = {
+                str(hour): {"available": True, "booking": None} for hour in range(24)
             }
 
-        # Mark booked hours
+        # Mark booked slots
         for booking in bookings:
             booking_date = booking.booking_date.strftime("%Y-%m-%d")
-            if booking_date in availability:
+            if booking_date in dates_dict:
                 for hour in range(
                     booking.booking_start_hour,
                     booking.booking_start_hour + booking.booking_duration_hours,
                 ):
-                    if hour < 24:  # Don't exceed day boundary
-                        availability[booking_date][hour] = {
+                    if hour < 24:
+                        dates_dict[booking_date][str(hour)] = {
                             "available": False,
                             "booking": {
-                                "booking_id": booking.booking_id,
                                 "start_hour": booking.booking_start_hour,
                                 "duration": booking.booking_duration_hours,
                                 "end_hour": booking.booking_start_hour
@@ -214,19 +227,17 @@ def get_boks_avaliability_by_id(
                             },
                         }
 
-        return {"box_id": box.box_id, "dates": availability}
+        return {"box_id": box.box_id, "dates": dates_dict}
 
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Error fetching availability: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 ###########################
 #### GET BOOKING BY ID ####
 
 
-@boxes_router.put("/update-boks-status")
+@boxes_router.put("/box-status")
 def update_boks_status(boks_update: BoksUpdate, db: Session = Depends(get_db)):
     try:
         # Get current time info

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Path
 from authentication.jwt import get_current_user
 from datetime import datetime
 from database import get_db
@@ -6,9 +6,9 @@ from sqlalchemy import func
 from models import Bookings, Boxes
 from bookings.types.booking_types import (
     BookingData,
-    GetBooking,
-    DeleteBooking,
-    GetBookingTime,
+    BookingResponse,
+    TimeSlotResponse,
+    DeleteBookingResponse,
 )
 import random
 
@@ -19,11 +19,28 @@ booking_router = APIRouter(dependencies=[Depends(get_current_user)])
 #### GET USER BOOKINGS ####
 
 
-@booking_router.post("/get-bookings")
-def get_booking(user: GetBooking, db=Depends(get_db)):
-    # Extract user_id from current_user
-    user_id = user.user_id
+#  get-bookings ->  bookings/{user_id}
+#  get-available-time-slots -> time-slots/{id}
+#  create-booking -> bookings/
+#  delete-booking -> bookings/{id}
 
+
+# HTTP GET /device-management/managed-devices  			//Get all devices
+# HTTP POST /device-management/managed-devices  			//Create new Device
+
+# HTTP GET /device-management/managed-devices/{id}  		//Get device for given Id
+# HTTP PUT /device-management/managed-devices/{id}  		//Update device for given Id
+# HTTP DELETE /device-management/managed-devices/{id}  	//Delete device for given Id
+
+# /booking/get-bookings?user_id=1000 --> /booking/get-bookings/1000
+
+
+@booking_router.get("/{user_id}", response_model=BookingResponse)
+def get_booking(
+    # ..., Required parameter with no default
+    user_id: int = Path(..., description="ID of the user"),
+    db=Depends(get_db),
+):
     # Get current date
     today = datetime.now().date()
 
@@ -33,9 +50,23 @@ def get_booking(user: GetBooking, db=Depends(get_db)):
         .filter(Bookings.user_id == user_id, func.date(Bookings.booking_date) >= today)
         .all()
     )
-
-    # Convert SQLAlchemy objects to dict for JSON response
-    bookings_list = [booking.__dict__ for booking in user_bookings]
+    # Format datetime objects as strings
+    bookings_list = []
+    for booking in user_bookings:
+        booking_dict = {
+            "booking_id": booking.booking_id,
+            "booking_date": booking.booking_date.strftime("%Y-%m-%d %H:%M:%S"),
+            "booking_code": booking.booking_code,
+            "booking_duration_hours": booking.booking_duration_hours,
+            "booking_timestamp": booking.booking_timestamp.strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),
+            "user_id": booking.user_id,
+            "booking_box_id_fk": booking.booking_box_id_fk,
+            "booking_start_hour": booking.booking_start_hour,
+            "booking_end_hour": booking.booking_end_hour,
+        }
+        bookings_list.append(booking_dict)
 
     return {"status": "success", "bookings": bookings_list}
 
@@ -47,15 +78,22 @@ def does_time_overlap(start1: int, end1: int, start2: int, end2: int) -> bool:
     return not (end1 <= start2 or start1 >= end2)
 
 
-@booking_router.post("/get-available-time-slots")
+# /get-available-time-slots/2/131224/1302/2
+@booking_router.get(
+    "/{fitness_center_id}/{booking_date}/{current_time}/{duration_hours}",
+    response_model=TimeSlotResponse,
+)
 def get_available_time_slots(
-    getBookingTime: GetBookingTime,
+    fitness_center_id: int = Path(..., description="ID of the fitness center"),
+    booking_date: str = Path(..., description="Date of the booking"),
+    current_time: str = Path(..., description="Current time in HHMM format"),
+    duration_hours: int = Path(..., description="Duration of the booking"),
     db=Depends(get_db),
 ):
-    current_time = getBookingTime.current_time
-    duration = getBookingTime.duration_hours
-    fitness_center_id = getBookingTime.fitness_center_id
-    date = getBookingTime.booking_date
+    current_time = f"{current_time[:2]}:{current_time[2:]}"
+    duration = duration_hours
+    fitness_center_id = fitness_center_id
+    date = booking_date
     try:
         # Parse current time and get next available hour
         current_hour = datetime.strptime(current_time, "%H:%M").hour
@@ -108,10 +146,12 @@ def get_available_time_slots(
                         }
                     )
 
-        # Remove boxes with no available slots
-        available_boxes = {
-            box_id: slots for box_id, slots in availability.items() if slots
-        }
+                # Remove boxes with no available slots
+                available_boxes = {
+                    str(box_id): slots
+                    for box_id, slots in availability.items()
+                    if slots
+                }
 
         return {
             "next_available_hour": next_available_hour,
@@ -129,7 +169,7 @@ def get_available_time_slots(
 #### CREATE NEW BOOKING ####
 
 
-@booking_router.post("/create-booking")
+@booking_router.post("")
 def create_booking(
     booking_data: BookingData,
     db=Depends(get_db),
@@ -168,10 +208,12 @@ def create_booking(
 #### DELETE BOOKING ####
 
 
-@booking_router.post("/delete-booking/")
-def delete_booking(delete_booking: DeleteBooking, db=Depends(get_db)):
+@booking_router.delete("/{booking_id}", response_model=DeleteBookingResponse)
+def delete_booking(
+    booking_id: int = Path(..., description="The ID of the booking"), db=Depends(get_db)
+):
     # Get the booking to delete
-    booking_id = delete_booking.booking_id
+
     booking_to_delete = (
         db.query(Bookings).filter(Bookings.booking_id == booking_id).first()
     )

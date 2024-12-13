@@ -143,7 +143,7 @@ async def signup(user: SignupUser, db: Session = Depends(get_db)):
             "user_phone": new_user.user_phone,
             "fitness_center": new_user.fitness_center.fitness_center_name,
             "fitness_center_id": new_user.fitness_center.fitness_center_id,
-            'is_member': new_user.is_member,
+            "is_member": new_user.is_member,
             "is_verified": new_user.is_verified,
             "user_role": new_user.user_role_fk,
             "user_role_name": new_user.user_role.role_name,

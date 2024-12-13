@@ -15,7 +15,7 @@ class PaymentIntentRequest(BaseModel):
 
 
 # Man skal være JWT verificeret for at kunne lave en betaling
-@payments_router.post("/create-payment-intent")
+@payments_router.post("/")
 async def create_payment_intent(request: PaymentIntentRequest):
     try:
         # Create a payment intent with the specified amount and currency

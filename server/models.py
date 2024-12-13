@@ -7,6 +7,7 @@ from sqlalchemy import (
     ForeignKey,
     Text,
     CheckConstraint,
+    BigInteger,
 )
 from sqlalchemy.orm import relationship
 from database import Base
@@ -43,7 +44,7 @@ class Boxes(Base):
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
     box_number = Column(Integer, nullable=False, autoincrement=True, unique=True)
-    box_availability = Column(String(255), nullable=False)
+    box_availability = Column(String(30), nullable=False)
     created_at = Column(DateTime, nullable=False)
     fitness_center_fk = Column(
         Integer, ForeignKey("fitness_centers.fitness_center_id"), nullable=False
@@ -58,7 +59,7 @@ class Bookings(Base):
     __tablename__ = "bookings"
 
     booking_id = Column(
-        Integer, primary_key=True, autoincrement=True, index=True, unique=True
+        BigInteger, primary_key=True, autoincrement=True, index=True, unique=True
     )
     user_id = Column(
         Integer, ForeignKey("users.user_id", ondelete="CASCADE"), nullable=False
@@ -96,11 +97,11 @@ class Users(Base):
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
     user_email = Column(String(255), nullable=False, unique=True)
-    user_first_name = Column(String(255), nullable=False)
-    user_last_name = Column(String(255), nullable=False)
+    user_first_name = Column(String(50), nullable=False)
+    user_last_name = Column(String(50), nullable=False)
     is_member = Column(Boolean, nullable=False, default=True)
     password_hash = Column(String, nullable=False)
-    user_phone = Column(String(255), nullable=False)
+    user_phone = Column(String(50), nullable=False)
     is_verified = Column(Boolean, default=False)
     verification_token = Column(String, nullable=True)
     created_at = Column(DateTime, nullable=False)
@@ -125,7 +126,7 @@ class FitnessCenters(Base):
     fitness_center_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
-    fitness_center_name = Column(String(255), nullable=False)
+    fitness_center_name = Column(String(50), nullable=False)
     fitness_center_address = Column(String(255), nullable=False)
     # fitness_boxes_fk = Column(Integer, ForeignKey("boxes.box_id"), nullable=False)
     boxes = relationship("Boxes", back_populates="fitness_center")
@@ -138,7 +139,7 @@ class UserRoles(Base):
     user_role_id = Column(
         Integer, primary_key=True, autoincrement=True, index=True, unique=True
     )
-    role_name = Column(String(255), nullable=False)
+    role_name = Column(String(30), nullable=False)
     users = relationship("Users", back_populates="user_role")
 
 
@@ -149,7 +150,7 @@ class Workout(Base):
     __tablename__ = "workouts"
 
     workout_id = Column(Integer, primary_key=True, index=True)
-    workout_name = Column(String(255), nullable=False)
+    workout_name = Column(String(25), nullable=False)
     workout_description = Column(Text, nullable=False)
     workout_level = Column(String(50), nullable=False)
     workout_image = Column(String, nullable=True)
@@ -172,7 +173,7 @@ class Week(Base):
     workout_id = Column(
         Integer, ForeignKey("workouts.workout_id", ondelete="CASCADE"), nullable=False
     )
-    week_name = Column(String(255), nullable=False)
+    week_name = Column(String(30), nullable=False)
     week_description = Column(Text, nullable=False)
 
     workout = relationship("Workout", back_populates="workout_weeks")
@@ -188,7 +189,7 @@ class Exercise(Base):
     week_id = Column(
         Integer, ForeignKey("weeks.week_id", ondelete="CASCADE"), nullable=False
     )
-    exercise_name = Column(String(255), nullable=False)
+    exercise_name = Column(String(50), nullable=False)
     exercise_description = Column(Text, nullable=False)
 
     week = relationship("Week", back_populates="exercises")

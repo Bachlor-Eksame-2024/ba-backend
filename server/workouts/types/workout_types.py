@@ -42,8 +42,7 @@ class CreateWorkout(BaseModel):
                         "exercises": [
                             {
                                 "exercise_name": "Bodyweight Squats (3 sets of 12)",
-                                "exercise_description":
-                                "Focus on proper form. Keep your back straight, chest up.",
+                                "exercise_description": "Focus on proper form. Keep your back straight, chest up.",
                             }
                         ],
                     }

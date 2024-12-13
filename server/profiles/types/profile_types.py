@@ -19,3 +19,19 @@ class UpdateProfile(BaseModel):
 
 class UserStats(BaseModel):
     user_id: str
+
+
+class MonthlyStat(BaseModel):
+    pv: int
+    name: str
+
+
+class WeeklyStat(BaseModel):
+    pv: int
+    name: str
+
+
+class UserStatsResponse(BaseModel):
+    total_bookings: int
+    monthly_stats: list[MonthlyStat]
+    weekly_stats: list[WeeklyStat]

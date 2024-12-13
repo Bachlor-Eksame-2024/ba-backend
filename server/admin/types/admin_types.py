@@ -70,12 +70,6 @@ class Booking(BaseModel):
     end_hour: int
 
 
-class Booking(BaseModel):
-    start_hour: int
-    duration: int
-    end_hour: int
-
-
 class HourAvailability(BaseModel):
     available: bool
     booking: Optional[Booking] = None

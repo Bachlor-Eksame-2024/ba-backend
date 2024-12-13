@@ -10,7 +10,6 @@ from models import Users, Bookings
 from profiles.types.profile_types import (
     ChangePassword,
     UpdateProfile,
-    UserStats,
     UserStatsResponse,
 )
 from authentication.validate import (
@@ -162,7 +161,6 @@ def get_user_stats(
 ):
     today = datetime.now()
     start_month = (today.replace(day=1) - timedelta(days=330)).replace(day=1)
-    four_weeks_ago = today - timedelta(weeks=4)
 
     monthly_bookings = {}
     weekly_bookings = {}

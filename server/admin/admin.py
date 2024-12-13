@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from math import ceil
 from database import get_db
 from authentication.jwt import get_current_user
-from models import Users, UserRoles
+from models import Users, UserRoles, Bookings
 from admin.types.admin_types import UsersResponse
 from .admin_boxes import boxes_router
 from .admin_stats import stats_router
@@ -143,6 +143,38 @@ def search_users(
         "page": page,
         "page_size": page_size,
         "total_pages": ceil(total_users / page_size),
+    }
+
+
+@admin_router.get("/booking/{booking_id}")
+def get_booking_by_id(
+    booking_id: int,
+    db: Session = Depends(get_db),
+):
+    booking = (
+        db.query(Bookings)
+        .join(Users, Users.user_id == Bookings.user_id)
+        .filter(Bookings.booking_id == booking_id)
+        .first()
+    )
+
+    if not booking:
+        raise HTTPException(status_code=404, detail="Booking not found")
+
+    return {
+        "booking_id": booking.booking_id,
+        "user_id": booking.user_id,
+        "booking_box_id_fk": booking.booking_box_id_fk,
+        "booking_date": booking.booking_date.strftime("%Y-%m-%d %H:%M:%S"),
+        "booking_code": booking.booking_code,
+        "booking_start_hour": booking.booking_start_hour,
+        "booking_duration_hours": booking.booking_duration_hours,
+        "booking_end_hour": booking.booking_end_hour,
+        "booking_timestamp": booking.booking_timestamp.strftime("%Y-%m-%d %H:%M:%S"),
+        "user_email": booking.user.user_email,
+        "user_first_name": booking.user.user_first_name,
+        "user_last_name": booking.user.user_last_name,
+        "user_phone": booking.user.user_phone,
     }
 
 

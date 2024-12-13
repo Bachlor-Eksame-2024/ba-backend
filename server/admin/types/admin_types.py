@@ -78,3 +78,19 @@ class HourAvailability(BaseModel):
 class BoxAvailabilityByIdResponse(BaseModel):
     box_id: int
     dates: Dict[str, Dict[str, HourAvailability]]
+
+
+class BookingDetailsResponse(BaseModel):
+    booking_id: int
+    user_id: int
+    booking_box_id_fk: int
+    booking_date: str
+    booking_code: str
+    booking_start_hour: int
+    booking_duration_hours: int
+    booking_end_hour: int
+    booking_timestamp: str
+    user_email: str
+    user_first_name: str
+    user_last_name: str
+    user_phone: str

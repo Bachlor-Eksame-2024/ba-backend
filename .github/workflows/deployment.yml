@@ -37,4 +37,7 @@ jobs:
         script: |
           cd ~/fitboks
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
+          docker-compose down backend
+          docker system prune -f
           docker-compose up -d backend
+          docker-compose logs backend

@@ -35,6 +35,6 @@ jobs:
         username: ${{ secrets.VPS_USERNAME_1 }}
         key: ${{ secrets.VPS_SSH_KEY_1 }}
         script: |
-          cd /fitboks
+          cd ~/fitboks
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
           docker-compose up -d backend

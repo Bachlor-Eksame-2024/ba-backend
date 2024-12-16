@@ -31,9 +31,9 @@ jobs:
     - name: Deploy to VPS
       uses: appleboy/ssh-action@master
       with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
-        key: ${{ secrets.VPS_SSH_KEY }}
+        host: ${{ secrets.VPS_HOST_1 }}
+        username: ${{ secrets.VPS_USERNAME_1 }}
+        key: ${{ secrets.VPS_SSH_KEY_1 }}
         script: |
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
           docker-compose up -d backend

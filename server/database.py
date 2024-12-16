@@ -15,7 +15,7 @@ SQLALCHEMY_DATABASE_URL = os.getenv(
 )
 
 ## use flush=True to force print to stdout immediately
-## print(f"Using DATABASE_URL: {SQLALCHEMY_DATABASE_URL}", flush=True)
+print(f"Using DATABASE_URL: {SQLALCHEMY_DATABASE_URL}", flush=True)
 
 ## Create a new engine
 engine = create_engine(SQLALCHEMY_DATABASE_URL)

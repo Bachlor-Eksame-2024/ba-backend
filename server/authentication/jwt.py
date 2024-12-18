@@ -23,6 +23,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 
 ## Function til at hente den nuværende bruger fra JWT token
 async def get_current_user(request: Request):
+    print("Cookies:", request.cookies)
     token = request.cookies.get("fitboks-auth-Token")
     print(f"Token: {token}", flush=True)
     if not token:

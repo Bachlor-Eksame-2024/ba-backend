@@ -63,8 +63,10 @@ async def login(user: LoginUser, db: Session = Depends(get_db)):
         key="fitboks-auth-Token",
         value=access_token,
         httponly=True,
-        samesite="Lax", # Set to Strict when production is https
-        secure=False, # Set to True when production is https
+        samesite="Lax",
+        secure=False,
+        domain="159.223.238.147",
+        path="/"
     )
     ## return the response with the JWT token
     return response

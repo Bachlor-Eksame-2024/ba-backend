@@ -1,4 +1,4 @@
-name: FastAPI CI Pipeline
+name: CI
 
 on:
   pull_request:
@@ -31,22 +31,18 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install flake8
-        shell: cmd
 
       - name: Run linting
         working-directory: ./server
         run: |
           flake8 . --max-line-length=100 --exclude=__pycache__,.venv
-        shell: cmd
 
       - name: Run tests
         working-directory: ./server
         run: |
           pytest -v --cov=. --cov-report=term-missing
-        shell: cmd
 
       - name: Cleanup
         if: always()
         run: |
           docker compose down -v --remove-orphans
-        shell: cmd

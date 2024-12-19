@@ -1,0 +1,350 @@
+[
+  {
+    "workout_id": "1",
+    "workout_name": "STRONG AND STEADY",
+    "workout_description": "This is a chest workout",
+    "workout_level": "Beginner",
+    "workout_weeks": [
+      {
+        "week_id": "1",
+        "week_name": "Week 1",
+        "week_description": "This is week 1",
+        "exercises": [
+          {
+            "exercise_name": "Bench Press",
+            "exercise_description": "This is a bench press"
+          },
+          {
+            "exercise_name": "Pushups",
+            "exercise_description": "This is a pushup"
+          },
+          {
+            "exercise_name": "Chest Fly",
+            "exercise_description": "This is a chest fly"
+          }
+        ]
+      },
+      {
+        "week_id": "2",
+        "week_name": "Week 2",
+        "week_description": "This is week 2",
+        "exercises": [
+          {
+            "exercise_name": "Incline Bench Press",
+            "exercise_description": "This is an incline bench press"
+          },
+          {
+            "exercise_name": "Dumbbell Fly",
+            "exercise_description": "This is a dumbbell fly"
+          },
+          {
+            "exercise_name": "Chest Press",
+            "exercise_description": "This is a chest press"
+          }
+        ]
+      },
+      {
+        "week_id": "3",
+        "week_name": "Week 3",
+        "week_description": "This is week 3",
+        "exercises": [
+          {
+            "exercise_name": "Decline Bench Press",
+            "exercise_description": "This is a decline bench press"
+          },
+          {
+            "exercise_name": "Chest Press",
+            "exercise_description": "This is a chest press"
+          },
+          {
+            "exercise_name": "Chest Fly",
+            "exercise_description": "This is a chest fly"
+          }
+        ]
+      },
+      {
+        "week_id": "4",
+        "week_name": "Week 4",
+        "week_description": "This is week 4",
+        "exercises": [
+          {
+            "exercise_name": "Dumbbell Bench Press",
+            "exercise_description": "This is a dumbbell bench press"
+          },
+          {
+            "exercise_name": "Chest Press",
+            "exercise_description": "This is a chest press"
+          },
+          {
+            "exercise_name": "Chest Fly",
+            "exercise_description": "This is a chest fly"
+          }
+        ]
+      }
+    ],
+    "workout_image": "https://images.unsplash.com/photo-1434608519344-49d77a699e1d?q=80&w=2948&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "created_at": "2021-01-01T00:00:00.000Z",
+    "updated_at": "2021-01-01T00:00:00.000Z"
+  },
+  {
+    "workout_id": "2",
+    "workout_name": "LEAN AND ACTIVE",
+    "workout_description": "This is a full-body workout",
+    "workout_level": "Intermediate",
+    "workout_weeks": [
+      {
+        "week_id": "1",
+        "week_name": "Week 1",
+        "week_description": "This is week 1",
+        "exercises": [
+          {
+            "exercise_name": "Squats",
+            "exercise_description": "This is a squat"
+          },
+          {
+            "exercise_name": "Pushups",
+            "exercise_description": "This is a pushup"
+          },
+          {
+            "exercise_name": "Plank",
+            "exercise_description": "This is a plank"
+          }
+        ]
+      },
+      {
+        "week_id": "2",
+        "week_name": "Week 2",
+        "week_description": "This is week 2",
+        "exercises": [
+          {
+            "exercise_name": "Deadlifts",
+            "exercise_description": "This is a deadlift"
+          },
+          {
+            "exercise_name": "Pullups",
+            "exercise_description": "This is a pullup"
+          },
+          {
+            "exercise_name": "Russian Twists",
+            "exercise_description": "This is a Russian twist"
+          }
+        ]
+      },
+      {
+        "week_id": "3",
+        "week_name": "Week 3",
+        "week_description": "This is week 3",
+        "exercises": [
+          {
+            "exercise_name": "Burpees",
+            "exercise_description": "This is a burpee"
+          },
+          {
+            "exercise_name": "Overhead Press",
+            "exercise_description": "This is an overhead press"
+          },
+          {
+            "exercise_name": "Leg Raises",
+            "exercise_description": "This is a leg raise"
+          }
+        ]
+      },
+      {
+        "week_id": "4",
+        "week_name": "Week 4",
+        "week_description": "This is week 4",
+        "exercises": [
+          {
+            "exercise_name": "Lunges",
+            "exercise_description": "This is a lunge"
+          },
+          {
+            "exercise_name": "Mountain Climbers",
+            "exercise_description": "This is a mountain climber"
+          },
+          {
+            "exercise_name": "Side Plank",
+            "exercise_description": "This is a side plank"
+          }
+        ]
+      }
+    ],
+    "workout_image": "https://images.unsplash.com/photo-1598971457999-ca4ef48a9a71?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "created_at": "2021-02-01T00:00:00.000Z",
+    "updated_at": "2021-02-01T00:00:00.000Z"
+  },
+  {
+    "workout_id": "3",
+    "workout_name": "POWER AND PERFORMANCE",
+    "workout_description": "This is a strength-focused workout",
+    "workout_level": "Advanced",
+    "workout_weeks": [
+      {
+        "week_id": "1",
+        "week_name": "Week 1",
+        "week_description": "This is week 1",
+        "exercises": [
+          {
+            "exercise_name": "Barbell Squats",
+            "exercise_description": "This is a barbell squat"
+          },
+          {
+            "exercise_name": "Bench Press",
+            "exercise_description": "This is a bench press"
+          },
+          {
+            "exercise_name": "Pullups",
+            "exercise_description": "This is a pullup"
+          }
+        ]
+      },
+      {
+        "week_id": "2",
+        "week_name": "Week 2",
+        "week_description": "This is week 2",
+        "exercises": [
+          {
+            "exercise_name": "Deadlifts",
+            "exercise_description": "This is a deadlift"
+          },
+          {
+            "exercise_name": "Military Press",
+            "exercise_description": "This is a military press"
+          },
+          {
+            "exercise_name": "Chin-ups",
+            "exercise_description": "This is a chin-up"
+          }
+        ]
+      },
+      {
+        "week_id": "3",
+        "week_name": "Week 3",
+        "week_description": "This is week 3",
+        "exercises": [
+          {
+            "exercise_name": "Front Squats",
+            "exercise_description": "This is a front squat"
+          },
+          {
+            "exercise_name": "Incline Bench Press",
+            "exercise_description": "This is an incline bench press"
+          },
+          {
+            "exercise_name": "Barbell Rows",
+            "exercise_description": "This is a barbell row"
+          }
+        ]
+      },
+      {
+        "week_id": "4",
+        "week_name": "Week 4",
+        "week_description": "This is week 4",
+        "exercises": [
+          {
+            "exercise_name": "Sumo Deadlifts",
+            "exercise_description": "This is a sumo deadlift"
+          },
+          {
+            "exercise_name": "Push Press",
+            "exercise_description": "This is a push press"
+          },
+          {
+            "exercise_name": "Farmer’s Walk",
+            "exercise_description": "This is a farmer's walk"
+          }
+        ]
+      }
+    ],
+    "workout_image": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2940&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "created_at": "2021-03-01T00:00:00.000Z",
+    "updated_at": "2021-03-01T00:00:00.000Z"
+  },
+  {
+    "workout_id": "4",
+    "workout_name": "ENDURANCE BOOST",
+    "workout_description": "This is a cardio and endurance workout",
+    "workout_level": "Beginner",
+    "workout_weeks": [
+      {
+        "week_id": "1",
+        "week_name": "Week 1",
+        "week_description": "This is week 1",
+        "exercises": [
+          {
+            "exercise_name": "Jogging",
+            "exercise_description": "This is a jogging session"
+          },
+          {
+            "exercise_name": "Jump Rope",
+            "exercise_description": "This is a jump rope session"
+          },
+          {
+            "exercise_name": "High Knees",
+            "exercise_description": "This is a high knees exercise"
+          }
+        ]
+      },
+      {
+        "week_id": "2",
+        "week_name": "Week 2",
+        "week_description": "This is week 2",
+        "exercises": [
+          {
+            "exercise_name": "Cycling",
+            "exercise_description": "This is a cycling session"
+          },
+          {
+            "exercise_name": "Burpees",
+            "exercise_description": "This is a burpee session"
+          },
+          {
+            "exercise_name": "Mountain Climbers",
+            "exercise_description": "This is a mountain climber session"
+          }
+        ]
+      },
+      {
+        "week_id": "3",
+        "week_name": "Week 3",
+        "week_description": "This is week 3",
+        "exercises": [
+          {
+            "exercise_name": "Running",
+            "exercise_description": "This is a running session"
+          },
+          {
+            "exercise_name": "Squat Jumps",
+            "exercise_description": "This is a squat jump exercise"
+          },
+          {
+            "exercise_name": "Plank Jacks",
+            "exercise_description": "This is a plank jack exercise"
+          }
+        ]
+      },
+      {
+        "week_id": "4",
+        "week_name": "Week 4",
+        "week_description": "This is week 4",
+        "exercises": [
+          {
+            "exercise_name": "Rowing",
+            "exercise_description": "This is a rowing session"
+          },
+          {
+            "exercise_name": "Jumping Lunges",
+            "exercise_description": "This is a jumping lunge exercise"
+          },
+          {
+            "exercise_name": "Spiderman Planks",
+            "exercise_description": "This is a spiderman plank exercise"
+          }
+        ]
+      }
+    ],
+    "workout_image": "https://images.unsplash.com/photo-1591258370814-01609b341790?q=80&w=2787&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "created_at": "2021-04-01T00:00:00.000Z",
+    "updated_at": "2021-04-01T00:00:00.000Z"
+  }
+]

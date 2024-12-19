@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request, Header
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database import get_db
@@ -7,6 +7,7 @@ from models import StripePayment
 from datetime import datetime
 import stripe
 import os
+from typing import Optional
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 payments_router = APIRouter(dependencies=[Depends(get_current_user)])
@@ -16,7 +17,7 @@ class PaymentIntentRequest(BaseModel):
     amount: int
     currency: str = "DKK"
     user_id: int
-    payment_method: str = "card"  # Can be 'card', 'link', or 'mobilepay'
+    payment_method: str = "card"
 
 
 @payments_router.post("/create-payment")
@@ -24,22 +25,25 @@ async def create_payment_intent(
     request: PaymentIntentRequest, db: Session = Depends(get_db)
 ):
     try:
-        # Create Stripe PaymentIntent with specific payment methods
+        # Create Stripe PaymentIntent
         intent = stripe.PaymentIntent.create(
             amount=request.amount,
-            currency=request.currency,
-            payment_method_types=["card", "link", "mobilepay"],  # Keep only this
-            # Remove automatic_payment_methods
+            currency=request.currency.lower(),
+            payment_method_types=["card"],
+            metadata={
+                "user_id": str(request.user_id),
+            },
         )
 
+        # Store payment intent in database
         db_payment = StripePayment(
             user_id=request.user_id,
             payment_intent_id=intent.id,
             amount=request.amount,
             currency=request.currency,
-            status=intent.status,
+            status="pending",
             payment_method=request.payment_method,
-            created_at=datetime.now(),
+            created_at=datetime.utcnow(),
         )
 
         db.add(db_payment)
@@ -56,28 +60,54 @@ async def create_payment_intent(
 
 
 @payments_router.post("/webhook")
-async def stripe_webhook(request: Request, db: Session = Depends(get_db)):
-    payload = await request.body()
-    sig_header = request.headers.get("stripe-signature")
+async def stripe_webhook(
+    request: Request,
+    stripe_signature: Optional[str] = Header(None),
+    db: Session = Depends(get_db),
+):
+    if not stripe_signature:
+        raise HTTPException(status_code=400, detail="Stripe signature is required")
 
     try:
-        event = stripe.Webhook.construct_event(
-            payload, sig_header, os.getenv("STRIPE_WEBHOOK_SECRET")
-        )
+        # Get the raw body
+        payload = await request.body()
 
+        # Verify webhook signature
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, stripe_signature, os.getenv("STRIPE_WEBHOOK_SECRET")
+            )
+        except stripe.error.SignatureVerificationError as e:
+            raise HTTPException(status_code=400, detail=str(e))
+
+        # Handle the event
         if event.type == "payment_intent.succeeded":
             payment_intent = event.data.object
+
             # Update payment status in database
             payment = (
                 db.query(StripePayment)
                 .filter(StripePayment.payment_intent_id == payment_intent.id)
                 .first()
             )
+
             if payment:
                 payment.status = "succeeded"
+                payment.updated_at = datetime.utcnow()
                 db.commit()
 
-        return {"status": "success"}
+                return {
+                    "status": "success",
+                    "message": "Payment processed successfully",
+                }
+            else:
+                raise HTTPException(
+                    status_code=404,
+                    detail=f"Payment with intent ID {payment_intent.id} not found",
+                )
+
+        # Handle other event types if needed
+        return {"status": "success", "message": f"Unhandled event type {event.type}"}
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -28,12 +28,38 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/backend:latest
 
-      - name: Deploy to VPS
+      - name: Deploy to VPS 1 (Primary)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.VPS_HOST_1 }}
           username: ${{ secrets.VPS_USERNAME_1 }}
           key: ${{ secrets.VPS_SSH_KEY_1 }}
+          script: |
+            cd ~/fitboks
+            docker compose pull backend
+            docker compose down backend
+            docker compose up -d backend --force-recreate
+            docker compose logs backend
+
+      - name: Deploy to VPS 2 (Secondary)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST_2 }}
+          username: ${{ secrets.VPS_USERNAME_2 }}
+          key: ${{ secrets.VPS_SSH_KEY_2 }}
+          script: |
+            cd ~/fitboks
+            docker compose pull backend
+            docker compose down backend
+            docker compose up -d backend --force-recreate
+            docker compose logs backend
+
+      - name: Deploy to VPS 3 (Tertiary)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.VPS_HOST_3 }}
+          username: ${{ secrets.VPS_USERNAME_3 }}
+          key: ${{ secrets.VPS_SSH_KEY_3 }}
           script: |
             cd ~/fitboks
             docker compose pull backend

@@ -12,6 +12,14 @@ env:
   PGADMIN_DEFAULT_EMAIL: admin@admin.com
   PGADMIN_DEFAULT_PASSWORD: admin
   COMPOSE_PROJECT_NAME: ba-backend
+  # Add other required environment variables with test values
+  API_KEY: test_api_key
+  STRIPE_SECRET_KEY: test_stripe_key
+  MAIL_USERNAME: test_mail_user
+  MAIL_PASSWORD: test_mail_pass
+  MAIL_FROM: test@example.com
+  MAIL_PORT: 587
+  MAIL_SERVER: smtp.example.com
 
 jobs:
   test-and-lint:
@@ -20,33 +28,22 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-      - name: Install system dependencies
+      - name: Build and start containers
         run: |
-          sudo apt-get update
-          sudo apt-get install -y postgresql postgresql-contrib postgresql-server-dev-all python3-dev
-
-      - name: Install Python dependencies
-        working-directory: ./server
-        run: |
-          python -m pip install --upgrade pip
-          pip install psycopg2-binary
-          pip install -r requirements.txt
-          pip install flake8
+          docker compose up -d postgres
+          # Wait for PostgreSQL to be ready
+          docker compose run --rm fastapi bash -c 'while ! nc -z postgres 5432; do sleep 1; done'
 
       - name: Run linting
-        working-directory: ./server
         run: |
-          flake8 . --max-line-length=100 --exclude=__pycache__,.venv
+          docker compose run --rm fastapi bash -c "pip install flake8 && flake8 . --max-line-length=100 --exclude=__pycache__,.venv"
 
       - name: Run tests
-        working-directory: ./server
         run: |
-          pytest -v --cov=. --cov-report=term-missing
+          docker compose run --rm fastapi pytest -v --cov=. --cov-report=term-missing
 
       - name: Cleanup
         if: always()

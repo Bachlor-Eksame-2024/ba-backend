@@ -23,7 +23,9 @@ app = FastAPI(debug=True, dependencies=[Depends(get_api_key)])
 origins = [
     "http://localhost:5173",
     "http://localhost",
+    "http://localhost:3000",
     "http://localhost:8080",
+    "http://159.223.238.147",
 ]
 
 app.add_middleware(
@@ -32,6 +34,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["Set-Cookie"],
 )
 
 

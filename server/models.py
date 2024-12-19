@@ -8,6 +8,7 @@ from sqlalchemy import (
     Text,
     CheckConstraint,
     BigInteger,
+    JSON,
 )
 from sqlalchemy.orm import relationship
 from database import Base
@@ -118,6 +119,7 @@ class Users(Base):
     bookings = relationship("Bookings", back_populates="user")
     fitness_center = relationship("FitnessCenters", back_populates="users")
     user_role = relationship("UserRoles", back_populates="users")
+    payments = relationship("StripePayment", back_populates="user")
 
 
 class FitnessCenters(Base):
@@ -193,3 +195,25 @@ class Exercise(Base):
     exercise_description = Column(Text, nullable=False)
 
     week = relationship("Week", back_populates="exercises")
+
+
+class StripePayment(Base):
+    __tablename__ = "payments"
+
+    payment_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    payment_intent_id = Column(String(255), unique=True)
+    stripe_customer_id = Column(String(255))
+    amount = Column(Integer, nullable=False)
+    currency = Column(String(3), default="DKK")
+    status = Column(String(50), nullable=False)
+    payment_method = Column(String(50))
+    payment_metadata = Column(JSON)
+    created_at = Column(
+        DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
+    )
+    updated_at = Column(
+        DateTime(timezone=True), onupdate=lambda: datetime.now(timezone.utc)
+    )
+
+    user = relationship("Users", back_populates="payments")

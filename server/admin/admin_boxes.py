@@ -240,6 +240,7 @@ def get_boks_avaliability_by_id(
 
 @boxes_router.put("/box-status")
 def update_boks_status(boks_update: BoksUpdate, db: Session = Depends(get_db)):
+    print(boks_update, flush=True)
     try:
         # Get current time info
         current_time = datetime.now()
@@ -283,7 +284,7 @@ def update_boks_status(boks_update: BoksUpdate, db: Session = Depends(get_db)):
             db.delete(booking)
 
         if boks_update.boks_availability == "Ledigt":
-            box.box_availability = "available"
+            box.box_availability = "Ledigt"
 
         elif boks_update.boks_availability.startswith("Lukket:"):
             duration = int(
@@ -293,9 +294,8 @@ def update_boks_status(boks_update: BoksUpdate, db: Session = Depends(get_db)):
                 random.choices(string.ascii_uppercase + string.digits, k=4)
             )
 
-            # Use nearest hour for booking
             new_booking = Bookings(
-                user_id=1,  # Admin user ID
+                user_id=boks_update.user_id,
                 booking_box_id_fk=box.box_id,
                 booking_date=nearest_hour,
                 booking_code=booking_code,
@@ -306,7 +306,8 @@ def update_boks_status(boks_update: BoksUpdate, db: Session = Depends(get_db)):
             )
 
             db.add(new_booking)
-            box.box_availability = "booket"
+            # Update to use original status text
+            box.box_availability = boks_update.boks_availability
 
         db.commit()
         return {"message": "Box status updated successfully"}

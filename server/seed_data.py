@@ -25,10 +25,12 @@ end_date = datetime.now() + timedelta(days=10)
 
 
 def create_user_roles(db: Session):
-    roles = ["admin", "user"]
+    roles = [
+        UserRoles(role_id=1, role_name="admin"),
+        UserRoles(role_id=2, role_name="user"),
+    ]
     for role in roles:
-        user_role = UserRoles(role_name=role)
-        db.add(user_role)
+        db.add(role)
     db.commit()
 
 

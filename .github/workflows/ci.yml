@@ -4,9 +4,6 @@ on:
   pull_request:
     branches:
       - develop
-  push:
-    branches:
-      - develop
 
 env:
   POSTGRES_USER: test_user
@@ -26,7 +23,7 @@ env:
 jobs:
   test-and-lint:
     runs-on: self-hosted
-    timeout-minutes: 10  # Add timeout to prevent hanging
+    timeout-minutes: 10
 
     steps:
       - uses: actions/checkout@v4
@@ -38,6 +35,8 @@ jobs:
         run: |
           echo "Building Docker images..."
           docker compose build --no-cache fastapi
+          # Verify the image was built
+          docker compose images
         timeout-minutes: 5
 
       - name: Start PostgreSQL and wait for it
@@ -59,31 +58,59 @@ jobs:
           exit 1
         timeout-minutes: 2
 
+      - name: Debug container status
+        run: |
+          echo "Current container status:"
+          docker compose ps
+          echo "\nContainer logs:"
+          docker compose logs
+
       - name: Install dependencies and run linting
         run: |
-          echo "Installing dependencies and running linting..."
-          docker compose run --rm fastapi bash -c '
+          echo "Starting FastAPI container..."
+          docker compose up -d fastapi
+          
+          echo "Waiting for FastAPI container to be ready..."
+          for i in {1..10}; do
+            if docker compose ps fastapi | grep -q "running"; then
+              echo "FastAPI container is running"
+              break
+            fi
+            echo "Waiting for FastAPI container to start... (attempt $i)"
+            sleep 2
+          done
+          
+          echo "Container status:"
+          docker compose ps
+          
+          echo "Running linting in FastAPI container..."
+          docker compose exec -T fastapi bash -c '
             pip install -r requirements.txt
             pip install flake8 pytest pytest-cov
             flake8 . --max-line-length=100 --exclude=__pycache__,.venv
-          '
+          ' || {
+            echo "Linting failed. Container logs:"
+            docker compose logs fastapi
+            exit 1
+          }
         timeout-minutes: 3
 
       - name: Run tests
         run: |
           echo "Running tests..."
-          docker compose run --rm fastapi pytest -v --cov=. --cov-report=term-missing
+          docker compose exec -T fastapi pytest -v --cov=. --cov-report=term-missing || {
+            echo "Tests failed. Container logs:"
+            docker compose logs fastapi
+            exit 1
+          }
         timeout-minutes: 3
 
       - name: Cleanup
         if: always()
         run: |
           echo "Cleaning up containers and volumes..."
-          docker compose down -v --remove-orphans
           docker compose logs > docker-logs.txt
+          docker compose down -v --remove-orphans
           
-          # If this is a failure, output the logs
-          if [ $? -ne 0 ]; then
-            echo "Docker logs from failed run:"
-            cat docker-logs.txt
-          fi
+          echo "Docker logs from run:"
+          cat docker-logs.txt

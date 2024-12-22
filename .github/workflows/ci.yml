@@ -5,21 +5,6 @@ on:
     branches:
       - develop
 
-env:
-  POSTGRES_USER: test_user
-  POSTGRES_PASSWORD: test_password
-  POSTGRES_DB: test_db
-  PGADMIN_DEFAULT_EMAIL: admin@admin.com
-  PGADMIN_DEFAULT_PASSWORD: admin
-  COMPOSE_PROJECT_NAME: ba-backend
-  API_KEY: test_api_key
-  STRIPE_SECRET_KEY: test_stripe_key
-  MAIL_USERNAME: test_mail_user
-  MAIL_PASSWORD: test_mail_pass
-  MAIL_FROM: test@example.com
-  MAIL_PORT: 587
-  MAIL_SERVER: smtp.example.com
-
 jobs:
   test-and-lint:
     runs-on: self-hosted
@@ -30,36 +15,20 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build images
-        run: docker compose build
+      - name: Build FastAPI image
+        run: docker compose build fastapi
 
-      - name: Start PostgreSQL
-        run: |
-          docker compose up -d postgres
-          # Wait for PostgreSQL to be ready
-          docker compose run --rm fastapi bash -c '
-            for i in $(seq 1 30); do
-              if pg_isready -h postgres -p 5432 -U $POSTGRES_USER; then
-                exit 0
-              fi
-              echo "Waiting for PostgreSQL..."
-              sleep 1
-            done
-            exit 1
-          '
-
-      - name: Install dependencies and run linting
+      - name: Run linting and tests
         run: |
           docker compose run --rm fastapi bash -c '
             pip install -r requirements.txt
             pip install flake8 pytest pytest-cov
+            echo "Running flake8..."
             flake8 . --max-line-length=100 --exclude=__pycache__,.venv
+            echo "Running tests..."
+            pytest -v --cov=. --cov-report=term-missing
           '
-
-      - name: Run tests
-        run: |
-          docker compose run --rm fastapi pytest -v --cov=. --cov-report=term-missing
 
       - name: Cleanup
         if: always()
-        run: docker compose down -v --remove-orphans
+        run: docker compose down --remove-orphans

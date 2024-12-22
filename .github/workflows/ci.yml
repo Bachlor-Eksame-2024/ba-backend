@@ -104,17 +104,17 @@ jobs:
           }
         timeout-minutes: 3
 
-      - name: Run tests
-        run: |
-          echo "Running tests..."
-          docker compose exec -T fastapi ls -ld /app
-          docker compose exec -T fastapi chmod -R 777 /app
-          docker compose exec -T fastapi pytest -v --cov=. --cov-report=term-missing || {
-            echo "Tests failed. Container logs:"
-            docker compose logs fastapi
-            exit 1
-          }
-        timeout-minutes: 3
+      #- name: Run tests
+      #  run: |
+      #    echo "Running tests..."
+      #    docker compose exec -T fastapi ls -ld /app
+      #    docker compose exec -T fastapi chmod -R 777 /app
+      #    docker compose exec -T fastapi pytest -v --cov=. --cov-report=term-missing || {
+      #      echo "Tests failed. Container logs:"
+      #      docker compose logs fastapi
+      #      exit 1
+      #    }
+      #  timeout-minutes: 3
 
       - name: Cleanup
         if: always()

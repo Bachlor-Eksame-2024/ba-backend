@@ -4,9 +4,6 @@ on:
   pull_request:
     branches:
       - develop
-  push:
-    branches:
-      - develop
 
 env:
   POSTGRES_USER: test_user
@@ -29,13 +26,17 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - name: Cleanup previous runs
+      - name: Initial workspace cleanup
         run: |
-          # Clean up any leftover files from previous runs
-          if [ -d "$GITHUB_WORKSPACE" ]; then
-            sudo chown -R $(id -u):$(id -g) "$GITHUB_WORKSPACE"
-            sudo find "$GITHUB_WORKSPACE" -type d -name "__pycache__" -exec rm -rf {} + || true
-          fi
+          echo "Current directory: $(pwd)"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          
+          # Force remove any existing pycache directories
+          sudo find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+          
+          # Clean up any previous docker containers
+          docker compose down --volumes --remove-orphans 2>/dev/null || true
+        timeout-minutes: 2
 
       - uses: actions/checkout@v4
 
@@ -113,23 +114,15 @@ jobs:
       - name: Cleanup
         if: always()
         run: |
-          echo "Cleaning up containers and volumes..."
-          docker compose logs > docker-logs.txt
-          docker compose down -v --remove-orphans
+          echo "Starting cleanup process..."
           
-          echo "Fixing permissions..."
-          sudo chown -R $(id -u):$(id -g) .
-          sudo find . -type d -name "__pycache__" -exec rm -rf {} + || true
+          # Stop and remove containers
+          echo "Stopping containers..."
+          docker compose down --volumes --remove-orphans || true
           
-          echo "Docker logs from run:"
-          cat docker-logs.txt
-
-      - name: Final cleanup
-        if: always()
-        run: |
-          # Ensure all files are owned by the runner user
-          sudo chown -R $(id -u):$(id -g) .
-          # Remove any remaining Docker containers and volumes
-          docker compose down -v --remove-orphans || true
-          # Clean up __pycache__ directories
-          sudo find . -type d -name "__pycache__" -exec rm -rf {} + || true
+          # Save logs before final cleanup
+          echo "Saving logs..."
+          docker compose logs > docker-logs.txt || true
+          
+          echo "Cleanup complete"
+        timeout-minutes: 2

@@ -12,7 +12,6 @@ env:
   PGADMIN_DEFAULT_EMAIL: admin@admin.com
   PGADMIN_DEFAULT_PASSWORD: admin
   COMPOSE_PROJECT_NAME: ba-backend
-  # Add other required environment variables with test values
   API_KEY: test_api_key
   STRIPE_SECRET_KEY: test_stripe_key
   MAIL_USERNAME: test_mail_user
@@ -31,15 +30,31 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and start containers
+      - name: Build images
+        run: docker compose build
+
+      - name: Start PostgreSQL
         run: |
           docker compose up -d postgres
           # Wait for PostgreSQL to be ready
-          docker compose run --rm fastapi bash -c 'while ! nc -z postgres 5432; do sleep 1; done'
+          docker compose run --rm fastapi bash -c '
+            for i in $(seq 1 30); do
+              if pg_isready -h postgres -p 5432 -U $POSTGRES_USER; then
+                exit 0
+              fi
+              echo "Waiting for PostgreSQL..."
+              sleep 1
+            done
+            exit 1
+          '
 
-      - name: Run linting
+      - name: Install dependencies and run linting
         run: |
-          docker compose run --rm fastapi bash -c "pip install flake8 && flake8 . --max-line-length=100 --exclude=__pycache__,.venv"
+          docker compose run --rm fastapi bash -c '
+            pip install -r requirements.txt
+            pip install flake8 pytest pytest-cov
+            flake8 . --max-line-length=100 --exclude=__pycache__,.venv
+          '
 
       - name: Run tests
         run: |
@@ -47,5 +62,4 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: |
-          docker compose down -v --remove-orphans
+        run: docker compose down -v --remove-orphans

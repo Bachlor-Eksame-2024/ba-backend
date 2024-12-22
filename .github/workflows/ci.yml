@@ -32,9 +32,11 @@ jobs:
       # Pre-cleanup to ensure no leftover files cause issues
       - name: Pre-cleanup
         run: |
-          if [ -d "/home/jonathan/github-runners/fitboks/ba-backend/ba-backend/server/__pycache__" ]; then
-            sudo rm -rf /home/jonathan/github-runners/fitboks/ba-backend/ba-backend/server/__pycache__
-          fi
+          echo "Attempting to remove __pycache__ directory..."
+          [ -d "/home/jonathan/github-runners/fitboks/ba-backend/ba-backend/server/__pycache__" ] && \
+            chmod -R u+w /home/jonathan/github-runners/fitboks/ba-backend/ba-backend/server/__pycache__ && \
+            rm -rf /home/jonathan/github-runners/fitboks/ba-backend/ba-backend/server/__pycache__ || \
+            echo "__pycache__ directory not found or already cleaned."
 
       # Checkout the repository
       - uses: actions/checkout@v4

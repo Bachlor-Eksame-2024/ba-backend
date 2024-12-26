@@ -11,6 +11,7 @@ from profiles.types.profile_types import (
     ChangePassword,
     UpdateProfile,
     UserStatsResponse,
+    UserRoleUpdate,
 )
 from authentication.validate import (
     validate_password,
@@ -19,6 +20,7 @@ from authentication.validate import (
     validate_last_name,
     validate_phone_number,
 )
+import logging, json
 
 profile_router = APIRouter(dependencies=[Depends(get_current_user)])
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -220,3 +222,38 @@ def get_user_stats(
         "monthly_stats": monthly_stats[::-1],
         "weekly_stats": weekly_stats[::-1],
     }
+
+
+@profile_router.post("/change-user-role")
+async def change_user_role(
+    request: UserRoleUpdate,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    try:
+        # Get admin info from nested structure
+        admin_info = current_user["user_info"]["sub"]
+
+        # Check if current user is admin
+        if admin_info["user_role"] != 1:
+            raise HTTPException(status_code=403, detail="Only admins can change roles")
+
+        # Get user to update
+        user = db.query(Users).filter(Users.user_id == request.user_id).first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        # Toggle role between admin (1) and user (2)
+        new_role = 2 if user.user_role_fk == 1 else 1
+        user.user_role_fk = new_role
+
+        db.commit()
+
+        return {
+            "status": "success",
+            "message": f"User role changed to {'admin' if new_role == 1 else 'user'}",
+        }
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))

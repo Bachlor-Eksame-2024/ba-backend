@@ -35,3 +35,7 @@ class UserStatsResponse(BaseModel):
     total_bookings: int
     monthly_stats: list[MonthlyStat]
     weekly_stats: list[WeeklyStat]
+
+
+class UserRoleUpdate(BaseModel):
+    user_id: int

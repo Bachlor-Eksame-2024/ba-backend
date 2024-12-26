@@ -25,10 +25,12 @@ end_date = datetime.now() + timedelta(days=10)
 
 
 def create_user_roles(db: Session):
-    roles = ["admin", "user"]
+    roles = [
+        UserRoles(role_id=1, role_name="admin"),
+        UserRoles(role_id=2, role_name="user"),
+    ]
     for role in roles:
-        user_role = UserRoles(role_name=role)
-        db.add(user_role)
+        db.add(role)
     db.commit()
 
 
@@ -41,7 +43,7 @@ def create_boxes(
         box = Boxes(
             box_number=i + 1,
             created_at=datetime.now(),
-            box_availability="available",
+            box_availability="Ledigt",
             fitness_center_fk=fitness_centers[
                 i % len(fitness_centers)
             ].fitness_center_id,

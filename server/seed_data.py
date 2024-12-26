@@ -1,7 +1,8 @@
 from faker import Faker
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from database import get_db
+from sqlalchemy import text
+from database import Base, engine, get_db
 from models import (
     UserRoles,
     FitnessCenters,
@@ -9,12 +10,18 @@ from models import (
     Boxes,
     Bookings,
     BookingAvailabilities,
+    Workout,
+    Week,
+    Exercise,
+    StripePayment,
 )
+
 from datetime import datetime, timedelta
 import random
 import string
 from typing import List
-
+from authentication.authentications import get_current_user
+from pydantic import BaseModel
 
 fake = Faker()
 seed_router = APIRouter()
@@ -25,10 +32,7 @@ end_date = datetime.now() + timedelta(days=10)
 
 
 def create_user_roles(db: Session):
-    roles = [
-        UserRoles(role_id=1, role_name="admin"),
-        UserRoles(role_id=2, role_name="user"),
-    ]
+    roles = [UserRoles(role_name="admin"), UserRoles(role_name="user")]
     for role in roles:
         db.add(role)
     db.commit()
@@ -163,6 +167,43 @@ async def seed_database(db: Session = Depends(get_db)):
 
         db.commit()
         return {"message": "Database seeded successfully"}
+    except Exception as e:
+        db.rollback()
+        return {"error": str(e)}
+
+
+class DeleteRequest(BaseModel):
+    key: str
+
+
+@seed_router.post("/recreate-tables")
+async def delete_tables(
+    request: DeleteRequest,
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    if request.key != "åøæsåpflåapkdfåpasl234":
+        return {"error": "Invalid key"}
+    try:
+        tables = [
+            "exercises",
+            "weeks",
+            "workouts",
+            "booking_availabilities",
+            "bookings",
+            "payments",
+            "boxes",
+            "users",
+            "fitness_centers",
+            "user_roles",
+        ]
+
+        for table in tables:
+            db.execute(text(f"TRUNCATE TABLE {table} RESTART IDENTITY CASCADE;"))
+
+        db.commit()
+        Base.metadata.create_all(bind=engine)
+        return {"message": "Tables Been Recreated successfully"}
     except Exception as e:
         db.rollback()
         return {"error": str(e)}

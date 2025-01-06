@@ -27,7 +27,8 @@ origins = [
     "http://localhost:8080",
     "http://159.223.238.147",  # Jonathan
     "http://164.92.227.113",  # Asger
-    "http://104.248.40.117/",  # Mille
+    "http://104.248.40.117",  # Mille
+    "http://104.248.40.117",  # Mille
 ]
 
 app.add_middleware(

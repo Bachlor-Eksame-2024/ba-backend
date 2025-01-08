@@ -8,9 +8,12 @@ from datetime import datetime
 import stripe
 import os
 from typing import Optional
+from csrf import validate_csrf
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
-payments_router = APIRouter(dependencies=[Depends(get_current_user)])
+payments_router = APIRouter(
+    dependencies=[Depends(get_current_user), Depends(validate_csrf)]
+)
 
 
 class PaymentIntentRequest(BaseModel):

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi_csrf_protect import CsrfProtect
 from passlib.context import CryptContext
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -28,7 +29,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 #####
 ##### Login Endpoint #####
 @authentication_router.post("/login")
-async def login(user: LoginUser, db: Session = Depends(get_db)):
+async def login(
+    user: LoginUser,
+    db: Session = Depends(get_db),
+    csrf_protect: CsrfProtect = Depends(),
+):
     # Get the user from the database
     get_user_in_db = db.query(Users).filter(Users.user_email == user.email).first()
     if not get_user_in_db:
@@ -64,10 +69,21 @@ async def login(user: LoginUser, db: Session = Depends(get_db)):
         value=access_token,
         httponly=True,
         samesite="Lax",  # Changed from "None" to "Lax"
-        secure=False,    # This should be True in production with HTTPS
+        secure=False,  # This should be True in production with HTTPS
         path="/",
-        domain=None      # You might need to explicitly set this
+        domain=None,  # You might need to explicitly set this
     )
+    ## CSRF token
+    csrf_token = csrf_protect.generate_csrf()
+    response.set_cookie(
+        key="fastapi-csrf-token",
+        value=csrf_token,
+        httponly=True,
+        samesite="Lax",
+        secure=True,
+        max_age=10800,
+    )
+    response.headers["X-CSRF-Token"] = csrf_token
     ## return the response with the JWT token
     return response
 
@@ -75,7 +91,11 @@ async def login(user: LoginUser, db: Session = Depends(get_db)):
 #####
 ##### SIGN UP #####
 @authentication_router.post("/signup")
-async def signup(user: SignupUser, db: Session = Depends(get_db)):
+async def signup(
+    user: SignupUser,
+    db: Session = Depends(get_db),
+    csrf_protect: CsrfProtect = Depends(),
+):
     # Validate Email
     if not valide_email(user.email):
         raise HTTPException(status_code=400, detail="Invalid email")
@@ -167,6 +187,17 @@ async def signup(user: SignupUser, db: Session = Depends(get_db)):
             samesite="Strict",
             secure=True,
         )
+        # CSRF token
+        csrf_token = csrf_protect.generate_csrf()
+        response.set_cookie(
+            key="fastapi-csrf-token",
+            value=csrf_token,
+            httponly=True,
+            samesite="Lax",
+            secure=True,
+            max_age=10800,
+        )
+        response.headers["X-CSRF-Token"] = csrf_token
         # Try to send email in background
         if new_user.user_id:
             try:
@@ -241,11 +272,16 @@ async def logout(request: Request):
 
 #####
 ##### Verify User login Endpoint #####
-@authentication_router.get("/verify-login")  # , response_model=Token)
-async def verify_Login(current_user: dict = Depends(get_current_user)):
-    if current_user:
-        response = JSONResponse(
-            {"message": "User is logged in", "user": current_user["user_info"]["sub"]},
-            status_code=200,
-        )
-    return response
+@authentication_router.get("/verify-login")
+async def verify_login(
+    request: Request,
+    csrf_protect: CsrfProtect = Depends(),
+    current_user: dict = Depends(get_current_user),
+):
+    try:
+        # Validate CSRF token
+        user_info = current_user.get("user_info", {}).get("sub", {})
+
+        return {"user": user_info}
+    except Exception as e:
+        raise HTTPException(status_code=403, detail=str(e))

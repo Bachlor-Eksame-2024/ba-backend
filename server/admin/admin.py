@@ -6,10 +6,13 @@ from database import get_db
 from authentication.jwt import get_current_user
 from models import Users, UserRoles, Bookings
 from admin.types.admin_types import UsersResponse
+from csrf import validate_csrf
 from .admin_boxes import boxes_router
 from .admin_stats import stats_router
 
-admin_router = APIRouter(dependencies=[Depends(get_current_user)])
+admin_router = APIRouter(
+    dependencies=[Depends(get_current_user), Depends(validate_csrf)]
+)
 admin_router.include_router(boxes_router)
 admin_router.include_router(stats_router)
 

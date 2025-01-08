@@ -1,6 +1,10 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.responses import JSONResponse
+from fastapi_csrf_protect import CsrfProtect
+from fastapi_csrf_protect.exceptions import CsrfProtectError
+from pydantic import BaseModel
+import secrets
 # from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base, get_api_key
 from authentication.authentications import authentication_router
@@ -17,6 +21,18 @@ import os
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
+
+
+# Add CSRF Settings
+class CsrfSettings(BaseModel):
+    secret_key: str = os.getenv("CSRF_SECRET_KEY")
+    token_expires_minutes: int = 180
+
+
+@CsrfProtect.load_config
+def get_csrf_config():
+    return CsrfSettings()
+
 
 app = FastAPI(debug=True, dependencies=[Depends(get_api_key)])
 
@@ -35,9 +51,16 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Set-Cookie"],
+    allow_headers=["*", "X-CSRF-Token"], 
+    expose_headers=["Set-Cookie", "X-CSRF-Token"],
 )
+
+
+@app.exception_handler(CsrfProtectError)
+def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
+    return JSONResponse(
+        status_code=403, content={"detail": "CSRF token missing or invalid"}
+    )
 
 
 # Dependency

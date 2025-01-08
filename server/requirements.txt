@@ -14,3 +14,4 @@ pytest-cov # For running tests and generating coverage reports
 fastapi-mail # For sending emails
 stripe # For handling payments
 faker # For generating fake data
+fastapi-csrf-protect==0.2.1 # For CSRF protection

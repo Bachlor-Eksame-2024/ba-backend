@@ -33,12 +33,17 @@ def does_time_overlap(start1: int, end1: int, start2: int, end2: int) -> bool:
 def get_box_availability(
     db: Session = Depends(get_db),
     fitness_center_id: int = Path(..., description="ID of the fitness center"),
-    date: datetime = Path(..., description="Date to check availability"),
+    date: str = Path(..., description="Date to check availability"),
     current_time: str = Path(..., description="Current time in HHMM format"),
     duration: int = Path(..., ge=1, le=4, description="Duration in hours (1-4)"),
 ):
     current_time = f"{current_time[:2]}:{current_time[2:]}"
     try:
+        # Parse date string to datetime
+        date_obj = datetime.strptime(date, "%Y-%m-%d")
+
+        # Format time string correctly (HHMM to HH:MM)
+        formatted_time = f"{current_time[:2]}:{current_time[2:]}"
         # Parse current time and get next available hour
         current_hour = datetime.strptime(current_time, "%H:%M").hour
         next_available_hour = current_hour + 1 if current_hour < 23 else None
@@ -56,7 +61,7 @@ def get_box_availability(
             db.query(Bookings)
             .filter(
                 Bookings.booking_box_id_fk.in_([box.box_id for box in boxes]),
-                func.date(Bookings.booking_date) == date.date(),
+                func.date(Bookings.booking_date) == date_obj.date(),
             )
             .all()
         )

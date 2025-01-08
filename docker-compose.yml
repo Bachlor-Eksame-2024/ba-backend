@@ -30,6 +30,7 @@ services:
       - MAIL_FROM=${MAIL_FROM}
       - MAIL_PORT=${MAIL_PORT}
       - MAIL_SERVER=${MAIL_SERVER}
+      - CSRF_SECRET_KEY=${CSRF_SECRET_KEY}
     depends_on:
       - postgres
 

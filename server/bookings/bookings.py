@@ -14,9 +14,7 @@ from bookings.types.booking_types import (
 import random
 
 
-booking_router = APIRouter(
-    dependencies=[Depends(get_current_user), Depends(validate_csrf)]
-)
+booking_router = APIRouter(dependencies=[Depends(get_current_user)])
 
 ###########################
 #### GET USER BOOKINGS ####

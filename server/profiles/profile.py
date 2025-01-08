@@ -8,7 +8,6 @@ from database import get_db
 from authentication.jwt import get_current_user, create_access_token
 from datetime import datetime, timezone, timedelta
 from models import Users, Bookings
-from csrf import validate_csrf
 from profiles.types.profile_types import (
     ChangePassword,
     UpdateProfile,
@@ -25,7 +24,7 @@ from authentication.validate import (
 import logging, json
 
 profile_router = APIRouter(
-    dependencies=[Depends(get_current_user), Depends(validate_csrf)]
+    dependencies=[Depends(get_current_user)]
 )
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ACCESS_TOKEN_EXPIRE_MINUTES = 180
@@ -155,17 +154,6 @@ async def update_profile(
         samesite="Strict",
         secure=True,
     )
-    ## CSRF token
-    csrf_token = csrf_protect.generate_csrf()
-    response.set_cookie(
-        key="fastapi-csrf-token",
-        value=csrf_token,
-        httponly=True,
-        samesite="Strict",
-        secure=True,
-        max_age=10800,
-    )
-    response.headers["X-CSRF-Token"] = csrf_token
 
     return {"message": "Profile updated successfully", "user": updated_user}
 

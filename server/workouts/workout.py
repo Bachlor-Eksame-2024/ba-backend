@@ -8,9 +8,9 @@ from authentication.jwt import get_current_user
 from typing import List
 from models import Workout, Week, Exercise
 from workouts.types.workout_types import CreateWorkout
-from csrf import validate_csrf
 
-workout_router = APIRouter(dependencies=[Depends(validate_csrf)])
+
+workout_router = APIRouter()
 
 
 # Update load_workouts function

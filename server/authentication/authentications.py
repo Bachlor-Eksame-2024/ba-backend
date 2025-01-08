@@ -73,16 +73,16 @@ async def login(
         path="/",
     )
     ## CSRF token
-    #csrf_token = csrf_protect.generate_csrf()
-    #response.set_cookie(
-    #    key="fastapi-csrf-token",
-    #    value=csrf_token,
-    #    httponly=True,
-    #    samesite="Strict",
-    #    secure=True,
-    #    max_age=10800,
-    #)
-    #response.headers["X-CSRF-Token"] = csrf_token
+    csrf_token = csrf_protect.generate_csrf()
+    response.set_cookie(
+        key="fastapi-csrf-token",
+        value=csrf_token,
+        httponly=True,
+        samesite="Strict",
+        secure=True,
+        max_age=10800,
+    )
+    response.headers["X-CSRF-Token"] = csrf_token
     ## return the response with the JWT token
     return response
 
@@ -274,7 +274,7 @@ async def logout(request: Request):
 @authentication_router.get("/verify-login")
 async def verify_login(
     request: Request,
-    #csrf_protect: CsrfProtect = Depends(),
+    csrf_protect: CsrfProtect = Depends(),
     current_user: dict = Depends(get_current_user),
 ):
     try:

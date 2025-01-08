@@ -5,6 +5,11 @@ from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 from pydantic import BaseModel
 import secrets
+# rate limit
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from slowapi.middleware import SlowAPIMiddleware
 # from sqlalchemy.orm import Session
 from database import SessionLocal, engine, Base, get_api_key
 from authentication.authentications import authentication_router
@@ -33,8 +38,13 @@ class CsrfSettings(BaseModel):
 def get_csrf_config():
     return CsrfSettings()
 
+limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI(debug=True, dependencies=[Depends(get_api_key)])
+# Add rate limit middleware
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_middleware(SlowAPIMiddleware)
 
 origins = [
     "http://localhost:5173",
@@ -74,26 +84,61 @@ def get_db():
 
 if os.getenv("ENABLE_USER_AUTH", "true") == "true":
     app.include_router(
-        authentication_router, prefix="/api/auth", tags=["User Authentication"]
+        authentication_router,
+        prefix="/api/auth",
+        tags=["User Authentication"],
+        # Rate limit to 30 requests per minute
+        dependencies=[Depends(limiter.limit("30/minute"))],
     )
 
 if os.getenv("ENABLE_BOOKING", "true") == "true":
-    app.include_router(booking_router, prefix="/api/booking", tags=["Booking Request"])
+    app.include_router(
+        booking_router,
+        prefix="/api/booking",
+        tags=["Booking Request"],
+        # Rate limit to 60 requests per minute
+        dependencies=[Depends(limiter.limit("60/minute"))],
+    )
 
 if os.getenv("ENABLE_PAYMENTS", "true") == "true":
-    app.include_router(payments_router, prefix="/api/payment", tags=["Stripe Payments"])
+    app.include_router(
+        payments_router,
+        prefix="/api/payment",
+        tags=["Stripe Payments"],
+        dependencies=[Depends(limiter.limit("60/minute"))],
+    )
 
 if os.getenv("ENABLE_WORKOUT", "true") == "true":
-    app.include_router(workout_router, prefix="/api/workout", tags=["Workouts"])
+    app.include_router(
+        workout_router,
+        prefix="/api/workout",
+        tags=["Workouts"],
+        dependencies=[Depends(limiter.limit("60/minute"))],
+    )
 
 if os.getenv("ENABLE_ADMIN", "true") == "true":
-    app.include_router(admin_router, prefix="/api/admin", tags=["Admin Requests"])
+    app.include_router(
+        admin_router,
+        prefix="/api/admin",
+        tags=["Admin Requests"],
+        dependencies=[Depends(limiter.limit("60/minute"))],
+    )
 
 if os.getenv("ENABLE_PROFILE", "true") == "true":
-    app.include_router(profile_router, prefix="/api/profile", tags=["Profile Changes"])
+    app.include_router(
+        profile_router,
+        prefix="/api/profile",
+        tags=["Profile Changes"],
+        dependencies=[Depends(limiter.limit("60/minute"))],
+    )
 
 # Add the seed router to the app
-app.include_router(seed_router, prefix="/api/seed", tags=["Database Seeding"])
+app.include_router(
+    seed_router,
+    prefix="/api/seed",
+    tags=["Database Seeding"],
+    dependencies=[Depends(limiter.limit("60/minute"))],
+)
 
 
 @app.get("/")

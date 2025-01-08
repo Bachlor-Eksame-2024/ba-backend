@@ -4,7 +4,6 @@ from datetime import datetime
 from database import get_db
 from sqlalchemy import func
 from models import Bookings, Boxes
-from csrf import validate_csrf
 from bookings.types.booking_types import (
     BookingData,
     BookingResponse,
@@ -15,7 +14,7 @@ import random
 
 
 booking_router = APIRouter(
-    dependencies=[Depends(get_current_user), Depends(validate_csrf)]
+    dependencies=[Depends(get_current_user)]
 )
 
 ###########################

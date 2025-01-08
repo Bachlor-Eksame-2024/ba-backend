@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse
-from fastapi_csrf_protect import CsrfProtect
 from passlib.context import CryptContext
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -31,8 +30,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 @authentication_router.post("/login")
 async def login(
     user: LoginUser,
-    db: Session = Depends(get_db),
-    #csrf_protect: CsrfProtect = Depends(),
+    db: Session = Depends(get_db)
 ):
     # Get the user from the database
     get_user_in_db = db.query(Users).filter(Users.user_email == user.email).first()
@@ -72,17 +70,6 @@ async def login(
         secure=True,  # This should be True in production with HTTPS
         path="/",
     )
-    ## CSRF token
-    csrf_token = csrf_protect.generate_csrf()
-    response.set_cookie(
-        key="fastapi-csrf-token",
-        value=csrf_token,
-        httponly=True,
-        samesite="Strict",
-        secure=True,
-        max_age=10800,
-    )
-    response.headers["X-CSRF-Token"] = csrf_token
     ## return the response with the JWT token
     return response
 
@@ -93,7 +80,6 @@ async def login(
 async def signup(
     user: SignupUser,
     db: Session = Depends(get_db),
-    csrf_protect: CsrfProtect = Depends(),
 ):
     # Validate Email
     if not valide_email(user.email):
@@ -186,17 +172,6 @@ async def signup(
             samesite="Strict",
             secure=True,
         )
-        # CSRF token
-        csrf_token = csrf_protect.generate_csrf()
-        response.set_cookie(
-            key="fastapi-csrf-token",
-            value=csrf_token,
-            httponly=True,
-            samesite="Strict",
-            secure=True,
-            max_age=10800,
-        )
-        response.headers["X-CSRF-Token"] = csrf_token
         # Try to send email in background
         if new_user.user_id:
             try:
@@ -274,11 +249,9 @@ async def logout(request: Request):
 @authentication_router.get("/verify-login")
 async def verify_login(
     request: Request,
-    csrf_protect: CsrfProtect = Depends(),
     current_user: dict = Depends(get_current_user),
 ):
     try:
-        # Validate CSRF token
         user_info = current_user.get("user_info", {}).get("sub", {})
 
         return {"user": user_info}

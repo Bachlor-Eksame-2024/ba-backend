@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi_csrf_protect import CsrfProtect
 from passlib.context import CryptContext
 from sqlalchemy import func
 from sqlalchemy.orm import Session
@@ -242,7 +243,6 @@ async def logout(request: Request):
     response = JSONResponse({"message": "User logged out"}, status_code=200)
     response.delete_cookie(key="fitboks-auth-Token")
     return response
-
 
 #####
 ##### Verify User login Endpoint #####

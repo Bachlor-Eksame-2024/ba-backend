@@ -16,13 +16,11 @@ from bookings.bookings import booking_router
 # import models
 import os
 
-
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI(debug=True, dependencies=[Depends(get_api_key)])
-
 
 origins = [
     "http://localhost:5173",
@@ -39,11 +37,9 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
-    expose_headers=["Set-Cookie"],
+    allow_headers=["*", "X-CSRF-Token"], 
+    expose_headers=["Set-Cookie", "X-CSRF-Token"],
 )
-
-
 
 
 # Dependency
@@ -59,50 +55,43 @@ if os.getenv("ENABLE_USER_AUTH", "true") == "true":
     app.include_router(
         authentication_router,
         prefix="/api/auth",
-        tags=["User Authentication"],
-    )
+        tags=["User Authentication"])
 
 if os.getenv("ENABLE_BOOKING", "true") == "true":
     app.include_router(
         booking_router,
         prefix="/api/booking",
-        tags=["Booking Request"],
-    )
+        tags=["Booking Request"])
 
 if os.getenv("ENABLE_PAYMENTS", "true") == "true":
     app.include_router(
         payments_router,
         prefix="/api/payment",
-        tags=["Stripe Payments"],
-    )
+        tags=["Stripe Payments"])
 
 if os.getenv("ENABLE_WORKOUT", "true") == "true":
     app.include_router(
         workout_router,
         prefix="/api/workout",
-        tags=["Workouts"],
-    )
+        tags=["Workouts"])
 
 if os.getenv("ENABLE_ADMIN", "true") == "true":
     app.include_router(
         admin_router,
         prefix="/api/admin",
-        tags=["Admin Requests"],
-    )
+        tags=["Admin Requests"])
 
 if os.getenv("ENABLE_PROFILE", "true") == "true":
     app.include_router(
         profile_router,
         prefix="/api/profile",
-        tags=["Profile Changes"],
-    )
+        tags=["Profile Changes"])
 
 # Add the seed router to the app
 app.include_router(
     seed_router,
     prefix="/api/seed",
-    tags=["Database Seeding"],
-)
+    tags=["Database Seeding"])
 
 
 @app.get("/")

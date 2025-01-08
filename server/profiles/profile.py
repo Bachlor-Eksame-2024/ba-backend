@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, Path
 from sqlalchemy.orm import Session
 from fastapi.responses import JSONResponse
+from fastapi_csrf_protect import CsrfProtect
 from sqlalchemy import func
 from passlib.context import CryptContext
 from database import get_db
 from authentication.jwt import get_current_user, create_access_token
 from datetime import datetime, timezone, timedelta
+from models import Users, Bookings
 from profiles.types.profile_types import (
     ChangePassword,
     UpdateProfile,
@@ -21,7 +23,9 @@ from authentication.validate import (
 )
 import logging, json
 
-profile_router = APIRouter(dependencies=[Depends(get_current_user)])
+profile_router = APIRouter(
+    dependencies=[Depends(get_current_user)]
+)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 ACCESS_TOKEN_EXPIRE_MINUTES = 180
 #########################

@@ -161,7 +161,7 @@ async def update_profile(
         key="fastapi-csrf-token",
         value=csrf_token,
         httponly=True,
-        samesite="Lax",
+        samesite="Strict",
         secure=True,
         max_age=10800,
     )

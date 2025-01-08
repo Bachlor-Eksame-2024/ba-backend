@@ -51,9 +51,9 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8080",
-    "http://159.223.238.147",  # Jonathan
-    "http://164.92.227.113",  # Asger
-    "http://104.248.40.117"  # Mille
+    "https://jonathan.fitboks.dk",  # Jonathan
+    "https://asger.fitboks.dk",  # Asger
+    "https://mille.fitboks.dk",  # Mille
 ]
 
 app.add_middleware(

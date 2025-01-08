@@ -68,10 +68,9 @@ async def login(
         key="fitboks-auth-Token",
         value=access_token,
         httponly=True,
-        samesite="Lax",  # Changed from "None" to "Lax"
-        secure=False,  # This should be True in production with HTTPS
+        samesite="Strict",  # Changed from "None" to "Lax"
+        secure=True,  # This should be True in production with HTTPS
         path="/",
-        domain=None,  # You might need to explicitly set this
     )
     ## CSRF token
     csrf_token = csrf_protect.generate_csrf()
@@ -79,7 +78,7 @@ async def login(
         key="fastapi-csrf-token",
         value=csrf_token,
         httponly=True,
-        samesite="Lax",
+        samesite="Strict",
         secure=True,
         max_age=10800,
     )
@@ -193,7 +192,7 @@ async def signup(
             key="fastapi-csrf-token",
             value=csrf_token,
             httponly=True,
-            samesite="Lax",
+            samesite="Strict",
             secure=True,
             max_age=10800,
         )

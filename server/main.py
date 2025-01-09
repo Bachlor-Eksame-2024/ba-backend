@@ -19,7 +19,6 @@ import os
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-
 app = FastAPI(debug=True)
 
 origins = [

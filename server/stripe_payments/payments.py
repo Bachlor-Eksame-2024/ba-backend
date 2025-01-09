@@ -15,6 +15,7 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 payments_router = APIRouter()
 
 
+
 class PaymentIntentRequest(BaseModel):
     amount: int
     currency: str = "DKK"
@@ -227,6 +228,7 @@ async def stripe_webhook(
 
 @payments_router.get("/{user_id}",dependencies=[Depends(get_api_key)],
     dependencies=[Depends(get_current_user)],)
+
 async def get_user_payments(
     user_id: str = Path(..., description="The ID of the user"), db: Session = Depends(get_db)
 ):

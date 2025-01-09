@@ -234,12 +234,6 @@ async def change_user_role(
     current_user: dict = Depends(get_current_user),
 ):
     try:
-        # Get admin info from nested structure
-        admin_info = current_user["user_info"]["sub"]
-
-        # Check if current user is admin
-        if admin_info["user_role"] != 1:
-            raise HTTPException(status_code=403, detail="Only admins can change roles")
 
         # Get user to update
         user = db.query(Users).filter(Users.user_id == request.user_id).first()

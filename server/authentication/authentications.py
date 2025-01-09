@@ -125,13 +125,13 @@ async def signup(
         user_first_name=user.first_name,
         user_last_name=user.last_name,
         fitness_center_fk=user.fitness_center_id,
-        user_role_fk=1,  # Assuming default role id is 1
+        user_role_fk=2,  
         is_member=True,
         is_verified=False,
         verification_token=verification_token,
         created_at=current_time,
         updated_at=current_time,
-        user_phone=user.phone,  # Ensure `phone` is a field in `SignupUser`
+        user_phone=user.phone, 
     )
     try:
         # Add and commit to database

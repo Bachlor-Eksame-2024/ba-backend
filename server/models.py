@@ -152,7 +152,7 @@ class Workout(Base):
     __tablename__ = "workouts"
 
     workout_id = Column(Integer, primary_key=True, index=True)
-    workout_name = Column(String(25), nullable=False)
+    workout_name = Column(String(100), nullable=False)
     workout_description = Column(Text, nullable=False)
     workout_level = Column(String(50), nullable=False)
     workout_image = Column(String, nullable=True)
@@ -175,7 +175,7 @@ class Week(Base):
     workout_id = Column(
         Integer, ForeignKey("workouts.workout_id", ondelete="CASCADE"), nullable=False
     )
-    week_name = Column(String(30), nullable=False)
+    week_name = Column(String(100), nullable=False)
     week_description = Column(Text, nullable=False)
 
     workout = relationship("Workout", back_populates="workout_weeks")
@@ -191,7 +191,7 @@ class Exercise(Base):
     week_id = Column(
         Integer, ForeignKey("weeks.week_id", ondelete="CASCADE"), nullable=False
     )
-    exercise_name = Column(String(50), nullable=False)
+    exercise_name = Column(String(100), nullable=False)
     exercise_description = Column(Text, nullable=False)
 
     week = relationship("Week", back_populates="exercises")

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, Request, Header
+from fastapi import APIRouter, HTTPException, Depends, Request, Header, Path
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from database import get_db
@@ -113,3 +113,44 @@ async def stripe_webhook(
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+
+@payments_router.get("/{user_id}")
+async def get_user_payments(
+    user_id: str = Path(..., description="The ID of the user"), db: Session = Depends(get_db)
+):
+    try:
+        # Get user_id from current user
+        user_id 
+
+        # Query payments for user
+        payments = (
+            db.query(StripePayment)
+            .filter(StripePayment.user_id == user_id)
+            .order_by(StripePayment.created_at.desc())
+            .all()
+        )
+
+        # Format payment data
+        payment_list = []
+        for payment in payments:
+            payment_list.append(
+                {
+                    "payment_id": payment.payment_id,
+                    "amount": payment.amount,
+                    "currency": payment.currency,
+                    "status": payment.status,
+                    "payment_intent_id": payment.payment_intent_id,
+                    "created_at": payment.created_at.isoformat(),
+                    "updated_at": (
+                        payment.updated_at.isoformat() if payment.updated_at else None
+                    ),
+                }
+            )
+
+        return {"status": "success", "payments": payment_list}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error fetching payments: {str(e)}"
+        )

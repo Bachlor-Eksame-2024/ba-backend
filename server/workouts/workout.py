@@ -1,6 +1,6 @@
 import os
 import json
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
 from database import get_db
 from sqlalchemy.orm import Session
@@ -129,14 +129,35 @@ async def create_workout(
     current_user: dict = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    # Convert the Pydantic models to dictionaries
-    workout_data_dicts = [workout.model_dump() for workout in workout_data]
-    # Pass the converted dictionaries to load_workouts
-    load_workouts(db, workout_data_dicts)
-    return JSONResponse(
-        {"message": "Workout created successfully", "workout": workout_data_dicts},
-        status_code=200,
-    )
+    try:
+        # Convert Pydantic models to dictionaries using V1 method
+        workout_data_dicts = [workout.dict() for workout in workout_data]
+
+        created_workouts = []
+
+        # Start transaction
+        try:
+            # Load workouts and get created data
+            created_workouts = load_workouts(db, workout_data_dicts)
+            db.commit()
+
+            return JSONResponse(
+                content={
+                    "status": "success",
+                    "message": "Workouts created successfully",
+                    "data": created_workouts,
+                },
+                status_code=201,
+            )
+
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(
+                status_code=500, detail=f"Failed to create workout: {str(e)}"
+            )
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid workout data: {str(e)}")
 
 
 @workout_router.delete("/{workout_id}")

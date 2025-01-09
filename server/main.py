@@ -20,7 +20,7 @@ import os
 Base.metadata.create_all(bind=engine)
 
 
-app = FastAPI(debug=True, dependencies=[Depends(get_api_key)])
+app = FastAPI(debug=True)
 
 origins = [
     "http://localhost:5173",
@@ -55,13 +55,15 @@ if os.getenv("ENABLE_USER_AUTH", "true") == "true":
     app.include_router(
         authentication_router,
         prefix="/api/auth",
-        tags=["User Authentication"])
+        tags=["User Authentication"],dependencies=[Depends(get_api_key)])
 
 if os.getenv("ENABLE_BOOKING", "true") == "true":
     app.include_router(
         booking_router,
         prefix="/api/booking",
-        tags=["Booking Request"])
+        tags=["Booking Request"],
+        dependencies=[Depends(get_api_key)],
+    )
 
 if os.getenv("ENABLE_PAYMENTS", "true") == "true":
     app.include_router(
@@ -73,19 +75,25 @@ if os.getenv("ENABLE_WORKOUT", "true") == "true":
     app.include_router(
         workout_router,
         prefix="/api/workout",
-        tags=["Workouts"])
+        tags=["Workouts"],
+        dependencies=[Depends(get_api_key)],
+    )
 
 if os.getenv("ENABLE_ADMIN", "true") == "true":
     app.include_router(
         admin_router,
         prefix="/api/admin",
-        tags=["Admin Requests"])
+        tags=["Admin Requests"],
+        dependencies=[Depends(get_api_key)],
+    )
 
 if os.getenv("ENABLE_PROFILE", "true") == "true":
     app.include_router(
         profile_router,
         prefix="/api/profile",
-        tags=["Profile Changes"])
+        tags=["Profile Changes"],
+        dependencies=[Depends(get_api_key)],
+    )
 
 # Add the seed router to the app
 app.include_router(

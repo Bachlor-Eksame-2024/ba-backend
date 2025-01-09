@@ -15,7 +15,6 @@ stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 payments_router = APIRouter()
 
 
-
 class PaymentIntentRequest(BaseModel):
     amount: int
     currency: str = "DKK"
@@ -24,9 +23,7 @@ class PaymentIntentRequest(BaseModel):
 
 
 @payments_router.post(
-    "/create-payment",
-    dependencies=[Depends(get_api_key)],
-    dependencies=[Depends(get_current_user)],
+    "/create-payment", dependencies=[Depends(get_api_key), Depends(get_current_user)]
 )
 async def create_payment_intent(
     request: PaymentIntentRequest, db: Session = Depends(get_db)
@@ -118,7 +115,7 @@ async def stripe_webhook(
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
+
 @payments_router.post("/webhook2")
 async def stripe_webhook(
     request: Request,
@@ -171,7 +168,7 @@ async def stripe_webhook(
 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
+
 @payments_router.post("/webhook3")
 async def stripe_webhook(
     request: Request,
@@ -226,8 +223,9 @@ async def stripe_webhook(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@payments_router.get("/{user_id}",dependencies=[Depends(get_api_key)],
-    dependencies=[Depends(get_current_user)],)
+@payments_router.get(
+    "/{user_id}", dependencies=[Depends(get_api_key), Depends(get_current_user)]
+)
 
 async def get_user_payments(
     user_id: str = Path(..., description="The ID of the user"), db: Session = Depends(get_db)

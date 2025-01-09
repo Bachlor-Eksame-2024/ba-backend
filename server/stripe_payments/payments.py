@@ -8,7 +8,6 @@ from datetime import datetime
 import stripe
 import os
 from typing import Optional
-from csrf import validate_csrf
 
 
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
@@ -78,7 +77,7 @@ async def stripe_webhook(
         # Verify webhook signature
         try:
             event = stripe.Webhook.construct_event(
-                payload, stripe_signature, os.getenv("STRIPE_WEBHOOK_SECRET")
+                payload, stripe_signature, os.getenv("STRIPE_SIGNING_SECRET_J")
             )
         except stripe.error.SignatureVerificationError as e:
             raise HTTPException(status_code=400, detail=str(e))
@@ -238,7 +237,7 @@ async def stripe_webhook(
         # Verify webhook signature
         try:
             event = stripe.Webhook.construct_event(
-                payload, stripe_signature, os.getenv("STRIPE_WEBHOOK_SECRET")
+                payload, stripe_signature, os.getenv("STRIPE_WEBHOOK_SECRET_M")
             )
         except stripe.error.SignatureVerificationError as e:
             raise HTTPException(status_code=400, detail=str(e))
@@ -291,7 +290,7 @@ async def stripe_webhook(
         # Verify webhook signature
         try:
             event = stripe.Webhook.construct_event(
-                payload, stripe_signature, os.getenv("STRIPE_WEBHOOK_SECRET")
+                payload, stripe_signature, os.getenv("STRIPE_WEBHOOK_SECRET_A")
             )
         except stripe.error.SignatureVerificationError as e:
             raise HTTPException(status_code=400, detail=str(e))
